@@ -159,19 +159,16 @@ class PrestaToKeyInvoice extends Module
      * */
     ##################################### Module Config End ##############################################
 
-    // vai buscar reposta do webservice
+    // vai buscar reposta do webservice que já estão na bd local.
     public function getWSResponse($result)
     {
-    	
-	   if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"')) {
+	   if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"'))
+       {
+            return reset($message)['message'];
+       }
 
-            $this->context->smarty->assign('result', $message);
 
-        } else {
-
-            $this->context->smarty->assign('result', "Resposta indefinida!");
-
-        }
+        return "Resposta indefinida!";
     }
     
     public function upsertProduct($kiapi_key,$ref,$designation, $shortName, $tax, $obs,$isService, $hasStocks, $active,$shortDesc, $longDesc, $price,$vendorRef,$ean)
@@ -193,11 +190,8 @@ class PrestaToKeyInvoice extends Module
         } else {
 
             $result = $client->insertProduct("$session", "$ref","$designation", "$shortName", "$tax", "$obs","$isService", "$hasStocks", "$active","$shortDesc", "$longDesc", "$price","$vendorRef", "$ean");
-        
         }
-        
-        $result=reset($result);
-        
+
         return $result;
     }
 
@@ -230,18 +224,18 @@ class PrestaToKeyInvoice extends Module
             $designation = isset($product->name) ?  reset($product->name) : 'N/A';
             $shortName = 'N/A';
             $tax = isset($product->tax_rate) ? $product->tax_rate : 'N/A';
-            $obs="Produto inserido via PrestaToKeyinvoice";
-            $isService=isset($product->is_virtual) ? $product->is_virtual : 'N/A';
-            $hasStocks="1";
-            $active="1";
-            $shortDesc = isset($product->description_short) ? strip_tags(reset($product->description_short)) : 'N/A';
-            $longDesc = isset($product->description) ? strip_tags(reset($product->description)) : 'N/A';
+            $obs = "Produto inserido via PrestaToKeyinvoice";
+            $isService = isset($product->is_virtual) ? $product->is_virtual : 'N/A';
+            $hasStocks = isset($product->is_virtual) ? ((int)$product->getQuantity($id_product) == 0 ? '0' : '1') : '0';
+            $active= isset($product->active) ? $product->active : '1';
+            $shortDesc = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
+            $longDesc = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
             $price = isset($product->price) ? $product->price : 'N/A';
             $vendorRef = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
             $ean = isset($product->ean13) ? $product->ean13 : 'N/A';
             
             $result=$this->upsertProduct($kiapi_key, $ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
-            $this->getWSResponse($result);
+            //$this->getWSResponse($result);
 
             /*
              * TODO
@@ -249,8 +243,8 @@ class PrestaToKeyInvoice extends Module
              * */
             if (count($result) > 0 && $result[0] != '1')
             {
-                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
-                $this->context->controller->errors[] = $message;
+                $errorMessage = $this->getWSResponse($result[0]);
+                $this->context->controller->errors[] = (count($result) == 1) ? $errorMessage : ($errorMessage . " - " . utf8_decode($result[1])) ;
             }
         }
     }
