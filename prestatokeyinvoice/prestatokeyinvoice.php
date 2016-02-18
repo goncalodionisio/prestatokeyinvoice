@@ -1,6 +1,8 @@
 <?php
 
+
 require('classes/ConfigsValidation.php');
+require('classes/GetValueByID.php');
 
 class PrestaToKeyInvoice extends Module
 {
@@ -29,7 +31,8 @@ class PrestaToKeyInvoice extends Module
 
         if (!$this->registerHook('displayAdminCustomers') ||
             !$this->registerHook('displayAdminOrder') ||
-            !$this->registerHook('ActionProductSave') ||
+            !$this->registerHook('actionProductSave') ||
+            !$this->registerHook('actionValidateOrder') ||
             !$this->registerHook('displayAdminProductsExtra')
             )
             return false;
@@ -76,13 +79,29 @@ class PrestaToKeyInvoice extends Module
     // Module configuration options
     public function processConfiguration()
     {
+    	$env = 'out';
         if (Tools::isSubmit('ptinvc_intgr_form')) {
             // API Webservice URL
             $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
             $kiapi_key = Tools::getValue('kiapi_key');
             // try comunication with WS
             try {
-                $client = new SoapClient($url);
+	    
+				if ($env == 'in') {
+				    $client = new SoapClient($url, array(
+				        'proxy_host' => 'gateway.zscaler.net',
+				        'proxy_port' => '80',
+				        'authentication' => SOAP_AUTHENTICATION_BASIC,
+				        'stream_context' => stream_context_create(array(
+				                'ssl' => array( 'verify_peer' => false,
+				                        'verify_peer_name' => false,
+				                        'allow_self_signed' => false)
+				        ))
+				    ));
+				} else {
+				
+			        $client = new SoapClient($url);
+				}
                 // see if key is valid before update config
                 if ($kiapi_key) {
 
@@ -102,7 +121,7 @@ class PrestaToKeyInvoice extends Module
                     $this->context->smarty->assign('no_configuration_key', 'na');
                 }
 
-            } catch (Exception $e){
+            } catch (Exception $e) {
                 $this->context->smarty->assign('no_soap', 'nok');
             }
         }
@@ -159,22 +178,41 @@ class PrestaToKeyInvoice extends Module
      * */
     ##################################### Module Config End ##############################################
 
-    // vai buscar reposta do webservice que já estão na bd local.
+    // vai buscar reposta do webservice
     public function getWSResponse($result)
     {
-	   if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"'))
-       {
-            return reset($message)['message'];
-       }
+    	
+	   if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"')) {
 
+            $this->context->smarty->assign('result', $message);
 
-        return "Resposta indefinida!";
+        } else {
+
+            $this->context->smarty->assign('result', "Resposta indefinida!");
+
+        }
     }
     
     public function upsertProduct($kiapi_key,$ref,$designation, $shortName, $tax, $obs,$isService, $hasStocks, $active,$shortDesc, $longDesc, $price,$vendorRef,$ean)
     {
+    	$env = 'out';
         $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
-        $client = new SoapClient($url);
+	    
+		if ($env == 'in') {
+		    $client = new SoapClient($url, array(
+		        'proxy_host' => 'gateway.zscaler.net',
+		        'proxy_port' => '80',
+		        'authentication' => SOAP_AUTHENTICATION_BASIC,
+		        'stream_context' => stream_context_create(array(
+		                'ssl' => array( 'verify_peer' => false,
+		                        'verify_peer_name' => false,
+		                        'allow_self_signed' => false)
+		        ))
+		    ));
+		} else {
+		
+	        $client = new SoapClient($url);
+		}
         // see if key is valid before update config
         $kiapi_auth =  $client->authenticate("$kiapi_key");
         $session = $kiapi_auth[1];
@@ -190,8 +228,11 @@ class PrestaToKeyInvoice extends Module
         } else {
 
             $result = $client->insertProduct("$session", "$ref","$designation", "$shortName", "$tax", "$obs","$isService", "$hasStocks", "$active","$shortDesc", "$longDesc", "$price","$vendorRef", "$ean");
+        
         }
-
+        
+        $result=reset($result);
+        
         return $result;
     }
 
@@ -224,18 +265,18 @@ class PrestaToKeyInvoice extends Module
             $designation = isset($product->name) ?  reset($product->name) : 'N/A';
             $shortName = 'N/A';
             $tax = isset($product->tax_rate) ? $product->tax_rate : 'N/A';
-            $obs = "Produto inserido via PrestaToKeyinvoice";
-            $isService = isset($product->is_virtual) ? $product->is_virtual : 'N/A';
-            $hasStocks = isset($product->is_virtual) ? ((int)$product->getQuantity($id_product) == 0 ? '0' : '1') : '0';
-            $active= isset($product->active) ? $product->active : '1';
-            $shortDesc = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
-            $longDesc = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
+            $obs="Produto inserido via PrestaToKeyinvoice";
+            $isService=isset($product->is_virtual) ? $product->is_virtual : 'N/A';
+            $hasStocks="1";
+            $active="1";
+            $shortDesc = isset($product->description_short) ? strip_tags(reset($product->description_short)) : 'N/A';
+            $longDesc = isset($product->description) ? strip_tags(reset($product->description)) : 'N/A';
             $price = isset($product->price) ? $product->price : 'N/A';
             $vendorRef = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
             $ean = isset($product->ean13) ? $product->ean13 : 'N/A';
             
             $result=$this->upsertProduct($kiapi_key, $ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
-            //$this->getWSResponse($result);
+            $this->getWSResponse($result);
 
             /*
              * TODO
@@ -243,14 +284,14 @@ class PrestaToKeyInvoice extends Module
              * */
             if (count($result) > 0 && $result[0] != '1')
             {
-                $errorMessage = $this->getWSResponse($result[0]);
-                $this->context->controller->errors[] = (count($result) == 1) ? $errorMessage : ($errorMessage . " - " . utf8_decode($result[1])) ;
+                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
+                $this->context->controller->errors[] = $message;
             }
         }
     }
 
 	###### primeira abordagem que nao funcionou na versao presta 1.6.0.9 ###############
-	
+	/*
     public function assignProductTabContent()
     {
     	$kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
@@ -316,142 +357,174 @@ class PrestaToKeyInvoice extends Module
     
     public function hookDisplayAdminProductsExtra()
     {
-       	$this->processProduct();
-       	$this->assignProductTabContent();
-       	
-        return $this->display(__FILE__, 'displayAdminProductsExtra.tpl');
-
-    }
+    	
+    	$id_product = (int)Tools::getValue('id_product');
+        if (Validate::isLoadedObject($product = new Product($id_product))) {
+        	
+	        if (Tools::isSubmit('process_product_form'))
+	        {
+				// Se a chave não existir coloca mensagem para o ecrã e sai
+		        if (!ConfigsValidation::kiApiKeyExists())
+		        {
+		            $this->context->controller->errors[] = 'API_Key not defined';
+		            return false;
+		        }
+		
+		        $env = 'out';
+				// API Webservice URL
+			    $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
+			    $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+				    
+				if ($env == 'in') {
+				    $client = new SoapClient($url, array(
+				        'proxy_host' => 'gateway.zscaler.net',
+				        'proxy_port' => '80',
+				        'authentication' => SOAP_AUTHENTICATION_BASIC,
+				        'stream_context' => stream_context_create(array(
+				                'ssl' => array( 'verify_peer' => false,
+				                        'verify_peer_name' => false,
+				                        'allow_self_signed' => false)
+				        ))
+				    ));
+				} else {
+				
+			        $client = new SoapClient($url);
+				}
 	
-	########################## fim primeira abordagem que nao funcionou no presta 1.6.0.9 ########################################
+		        // see if key is valid before update config
+		        $kiapi_auth =  $client->authenticate("$kiapi_key");
+		        $session = $kiapi_auth[1];
+					
+				$tax_rate = PrestaToKeyInvoiceGetValueByID::getTaxByID($product->getIdTaxRulesGroup());
+				
+			    $this->upsertProduct($kiapi_key, $product->reference, $product->name, "N/A", "$tax_rate", "Produto inserido via PrestaToKeyinvoice", $cartProduct['is_virtual'], "1", $cartProduct['active'], "N/A", "N/A", $cartProduct['product_price'], "N/A", $cartProduct['ean13']);
+				    	$kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+        $product = new Product((int)Tools::getValue('id_product'));
+        $ref = isset($product->reference) ? $product->reference : 'N/A';
+        $designation = isset($product->name) ? $product->name : 'N/A';
+        $shortName = 'N/A';
+        $tax = isset($product->tax_rate) ? $product->tax_rate : 'N/A';
+        $obs="Produto inserido via PrestaToKeyinvoice";
+        $isService=isset($product->is_virtual) ? $product->is_virtual : 'N/A';
+        $hasStocks="1";
+        $active="1";
+        $shortDesc = isset($product->description_short) ? $product->description_short : 'N/A';
+        $longDesc = isset($product->description) ? $product->description : 'N/A';
+        $price = isset($product->price) ? $product->price : 'N/A';
+        $vendorRef = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
+        $ean = isset($product->ean13) ? $product->ean13 : 'N/A';
+			}
+			$getFields=$product->name;
+            $this->context->smarty->assign('product', $getFields);
+		}
+	    return $this->display(__FILE__, 'displayAdminProductsExtra.tpl');
+	
+	}
+*/
+	/* hook em standby 
+	public function hookActionValidateOrder($params)
+	{
+		if ($this->context->cookie->id_cart)
+		{
+		    $cart = new CartCore($this->context->cookie->id_cart);
+			$id_customer=$cart->id_customer;
+			$getProducts=$cart->getProducts();
+	        $env = 'out';
+		    // API Webservice URL
+	        $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
+	        $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+		    
+			if ($env == 'in') {
+			    $client = new SoapClient($url, array(
+			        'proxy_host' => 'gateway.zscaler.net',
+			        'proxy_port' => '80',
+			        'authentication' => SOAP_AUTHENTICATION_BASIC,
+			        'stream_context' => stream_context_create(array(
+			                'ssl' => array( 'verify_peer' => false,
+			                        'verify_peer_name' => false,
+			                        'allow_self_signed' => false)
+			        ))
+			    ));
+			} else {
+			
+		        $client = new SoapClient($url);
+			}
+	        // see if key is valid before update config
+	        $kiapi_auth =  $client->authenticate("$kiapi_key");
+	        $session = $kiapi_auth[1];
 
-    public function assignClientTabContent()
-    {
-        $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
-        $customer = new CustomerCore((int)Tools::getValue('id_customer'));
-        /*
-         TODO 
-		 Falta mapear campos cliente
-		 Garantir que kiapi_key esta configurada ou dar erro
-         */
-        
-        //var_dump($customer);
- 
-        $nif = "N/A";
-        $name = "N/A";
-        $address = "N/A";
-        $postalCode = "N/A";
-        $locality = "N/A";
-        $phone = "N/A";
-        $fax = "N/A";
-        $email = "N/A";
-        $obs = "Cliente inserido via PrestaToKeyinvoice";
+			//$client->insertDocumentHeader("$session", "224167626", "15", "$id_customer","op_name","opt_nif", "opt_address", "opt_locality", "opt_postalCode", "docRef");
+			//$client->insertDocumentLine("$session", "1", "15", "demo_1", "1", "", "", "", "");
+			
 
-        $this->context->smarty->assign('kiapi_key', $kiapi_key);
-        $this->context->smarty->assign('nif', $nif);
-        $this->context->smarty->assign('name', $name);
-        $this->context->smarty->assign('address', $address);
-        $this->context->smarty->assign('postalCode', $postalCode);
-        $this->context->smarty->assign('locality', $locality);
-        $this->context->smarty->assign('phone', $phone);
-        $this->context->smarty->assign('fax', $fax);
-        $this->context->smarty->assign('email', $email);
-        $this->context->smarty->assign('obs', $obs);
-        
-    }
-    
-    public function processClient()
-    {
-        /*
-         TODO 
-		 Submeter customer via upsertCustomer()
-         */
-        if (Tools::isSubmit('process_client_form')) {
-            $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";            
-            $kiapi_key = Tools::getValue('kiapi_key');
-            $nif = Tools::getValue('nif');
-            $name = Tools::getValue('name');
-            $address = Tools::getValue('address');
-            $postalCode = Tools::getValue('postalCode');
-            $locality = Tools::getValue('locality');
-            $phone = Tools::getValue('phone');
-            $fax = Tools::getValue('fax');
-            $email = Tools::getValue('email');
-            $obs = Tools::getValue('obs');
-        
-            // try comunication with WS
-            try {
-
-               $client = new SoapClient($url);
-                // see if key is valid before update config
-                $kiapi_auth =  $client->authenticate("$kiapi_key");
-                $session = $kiapi_auth[1];
-                
-                $result = $client->insertClient("$sid", 
-                    "$nif",
-                    "$name",
-                    "$address",
-                    "$postalCode",
-                    "$locality",
-                    "$phone",
-                    "$fax",
-                    "$email",
-                    "$obs"
-                    );
-
-                $result=reset($result);
-                
-                // get WS response string
-                if ($message = Db::getInstance()->executeS('
-                SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response`
-                WHERE `code` = "'.(string)$result.'"')) {
-                
-                    $this->context->smarty->assign('result', $message);
-                } else {
-                    
-                    $this->context->smarty->assign('result', "Resposta indefinida!");
-                }
-               
-            } catch (Exception $e){
-                    
-                $this->context->smarty->assign('no_soap', 'nok');
-            }
         }
-    }
-
-    public function hookDisplayAdminCustomers()
-    {
-        $this->processClient();
-        $this->assignClientTabContent();
-        return $this->display(__FILE__, 'displayAdminCustomers.tpl');
-    
-    }
-
-	/*
-	TODO
-	das encomendas, quase tudo, in progress
-	*/
+	
+	}
+    */
     public function hookDisplayAdminOrder()
     {
+
         $id_order = (int)Tools::getValue('id_order');
         if (Validate::isLoadedObject($order = new OrderCore($id_order))) {
-            $cartProducts = $order->getCartProducts();
-            $orderCustomer= $order->getCustomer();
-            $address_delivery = new AddressCore($order->id_address_delivery);
-            $address_invoice = new AddressCore($order->id_address_invoice);
-            $address_delivery_fields=$address_delivery->getFields();
-            $address_invoice_fields=$address_invoice->getFields();
-            $id_address_delivery=$order->id_address_delivery;
-            $id_address_invoice=$order->id_address_invoice;
             
-
-            $this->context->smarty->assign('id_address_invoice', $id_address_invoice);
-            $this->context->smarty->assign('id_address_delivery', $id_address_delivery);
-            $this->context->smarty->assign('address_delivery_fields', $address_delivery_fields);
-            $this->context->smarty->assign('address_invoice_fields', $address_invoice_fields);
-            
-            $this->context->smarty->assign('cartProducts', $cartProducts);
-            $this->context->smarty->assign('orderCustomer', $orderCustomer);
+	        if (Tools::isSubmit('process_sync_order'))
+	        {
+				// Se a chave não existir coloca mensagem para o ecrã e sai
+		        if (!ConfigsValidation::kiApiKeyExists())
+		        {
+		            $this->context->controller->errors[] = 'API_Key not defined';
+		            return false;
+		        }
+		
+		        $env = 'out';
+				// API Webservice URL
+			    $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
+			    $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+				    
+				if ($env == 'in') {
+				    $client = new SoapClient($url, array(
+				        'proxy_host' => 'gateway.zscaler.net',
+				        'proxy_port' => '80',
+				        'authentication' => SOAP_AUTHENTICATION_BASIC,
+				        'stream_context' => stream_context_create(array(
+				                'ssl' => array( 'verify_peer' => false,
+				                        'verify_peer_name' => false,
+				                        'allow_self_signed' => false)
+				        ))
+				    ));
+				} else {
+				
+			        $client = new SoapClient($url);
+				}
+	
+		        // see if key is valid before update config
+		        $kiapi_auth =  $client->authenticate("$kiapi_key");
+		        $session = $kiapi_auth[1];
+	
+				$result_header = $client->insertDocumentHeader("$session", "224167626", "15", "","","", "", "", "", "");
+				$docID=$result_header[1];
+				
+				// produtos
+				$result_line='';
+	            $cartProducts = $order->getCartProducts();
+				
+				foreach ($cartProducts as $cartProduct) {
+					
+	            	$tax_rate = PrestaToKeyInvoiceGetValueByID::getTaxByID($cartProduct['id_tax_rules_group']);
+	                $result=$this->upsertProduct($kiapi_key, $cartProduct['product_reference'], $cartProduct['product_name'], "N/A", "$tax_rate", "Produto inserido via PrestaToKeyinvoice", $cartProduct['is_virtual'], "1", $cartProduct['active'], "N/A", "N/A", $cartProduct['product_price'], "N/A", $cartProduct['ean13']);
+					if (count($result) > 0 && $result[0] != '1')
+		            {
+		                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
+		                $this->context->controller->errors[] = $message;
+		            }
+					$result = $client->insertDocumentLine("$session", "$docID", "15", $cartProduct['product_reference'], $cartProduct['product_quantity'], "", "", "", "");
+					if (count($result) > 0 && $result[0] != '1')
+		            {
+		                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
+		                $this->context->controller->errors[] = $message;
+		            }
+				}
+	        }
             
             return $this->display(__FILE__, 'displayAdminOrder.tpl');
         }
