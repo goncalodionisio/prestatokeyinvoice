@@ -1,0 +1,23 @@
+
+.alert {
+  padding: 15px;
+  margin-bottom: 18px;
+  border: 1px solid transparent;
+  border-radius: 0px; }
+  
+  .alert-danger hr {
+    border-top-color: #c32933; }
+  .alert-danger .alert-link {
+    color: #e6e6e6; }
+     .alert.alert-danger:before {
+      font-family: "FontAwesome";
+      content: "\f057";
+      font-size: 20px;
+      vertical-align: -2px;
+      padding-right: 7px;
+      float: left; }
+.alert-danger {
+  background-color: #BCCBE5 !important;
+  border-color: #4070C2 !important;
+  color: #fff !important; 
+  }
