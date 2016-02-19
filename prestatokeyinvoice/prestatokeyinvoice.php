@@ -171,6 +171,15 @@ class PrestaToKeyInvoice extends Module
 
         return "Resposta indefinida!";
     }
+	
+	public function sendWSErrorResponse($result)
+    {
+		if (count($result) > 0 && $result[0] != '1')
+        {
+            $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
+            $this->context->controller->errors[] =utf8_decode($message);
+        }
+	}
     
     public function upsertProduct($kiapi_key,$ref,$designation, $shortName, $tax, $obs,$isService, $hasStocks, $active,$shortDesc, $longDesc, $price,$vendorRef,$ean)
     {
@@ -434,6 +443,11 @@ class PrestaToKeyInvoice extends Module
 	*/
     public function hookDisplayAdminOrder()
     {
+		// sai se não for para sincronizar com a api das encomendas
+        if (!ConfigsValidation::syncOrders())
+        {
+            return false;
+        }
 
         $id_order = (int)Tools::getValue('id_order');
         if (Validate::isLoadedObject($order = new OrderCore($id_order))) {
@@ -450,13 +464,14 @@ class PrestaToKeyInvoice extends Module
 				// API Webservice URL
 			    $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
 			    $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
-			   $client = new SoapClient($url);
+				$client = new SoapClient($url);
 	
 		        // see if key is valid before update config
 		        $kiapi_auth =  $client->authenticate("$kiapi_key");
 		        $session = $kiapi_auth[1];
 	
 				$result_header = $client->insertDocumentHeader("$session", "224167626", "15", "","","", "", "", "", "");
+					
 				$docID=$result_header[1];
 				
 				// produtos
@@ -464,20 +479,12 @@ class PrestaToKeyInvoice extends Module
 	            $cartProducts = $order->getCartProducts();
 				
 				foreach ($cartProducts as $cartProduct) {
-					
 	            	$tax_rate = PrestaToKeyInvoiceGetValueByID::getTaxByID($cartProduct['id_tax_rules_group']);
 	                $result=$this->upsertProduct($kiapi_key, $cartProduct['product_reference'], $cartProduct['product_name'], "N/A", "$tax_rate", "Produto inserido via PrestaToKeyinvoice", $cartProduct['is_virtual'], "1", $cartProduct['active'], "N/A", "N/A", $cartProduct['product_price'], "N/A", $cartProduct['ean13']);
-					if (count($result) > 0 && $result[0] != '1')
-		            {
-		                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
-		                $this->context->controller->errors[] = $message;
-		            }
+					$this->sendWSErrorResponse($result);
+
 					$result = $client->insertDocumentLine("$session", "$docID", "15", $cartProduct['product_reference'], $cartProduct['product_quantity'], "", "", "", "");
-					if (count($result) > 0 && $result[0] != '1')
-		            {
-		                $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
-		                $this->context->controller->errors[] = $message;
-		            }
+					$this->sendWSErrorResponse($result);
 				}
 	        }
             
