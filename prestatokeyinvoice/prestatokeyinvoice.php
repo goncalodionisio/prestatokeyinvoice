@@ -454,7 +454,7 @@ class PrestaToKeyInvoice extends Module
         {
             $this->context->controller->errors[] = 'API_Key not defined';
             return false;
-                }
+        }
 
         $id_order = (int)Tools::getValue('id_order');
         if (Validate::isLoadedObject($order = new OrderCore($id_order))) {
