@@ -251,11 +251,7 @@ class PrestaToKeyInvoice extends Module
              * TODO
              *  Caso seja erro enviar o codigo do erro para o ecrã a mensagem tem de ser formatada.
              * */
-            if (count($result) > 0 && $result[0] != '1')
-            {
-                $errorMessage = $this->getWSResponse($result[0]);
-                $this->context->controller->errors[] = (count($result) == 1) ? $errorMessage : ($errorMessage . " - " . utf8_decode($result[1])) ;
-            }
+            $this->sendWSErrorResponse($result);
         }
     }
 
