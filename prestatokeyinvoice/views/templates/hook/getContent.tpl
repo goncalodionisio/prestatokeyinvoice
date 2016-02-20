@@ -4,8 +4,6 @@
     <div class="alert alert-danger">{l s='Key not recognized!' mod='prestatokeyinvoice'}</div>
 {elseif isset($no_configuration_key)}
     <div class="alert alert-info">{l s='No API key set yet' mod='prestatokeyinvoice'}</div>
-{elseif isset($keyinvoice_sync_update)}
-	<div class="alert alert-success">{l s='KeyInvoice syncronization update' mod='prestatokeyinvoice'}</div>
 {/if}
 {if isset($no_soap)}
 	<div class="alert alert-danger">{l s='There was no comunication with Webservice! Try again later!' mod='prestatokeyinvoice'}</div>
@@ -36,9 +34,7 @@
 				</div>
 			</div>
 
-			<div class="submit">
-				<button type="submit" name="ptinvc_intgr_form" class="button btn btn-default button-medium"><span>{l s='Send' mod='prestatokeyinvoice'} <i class="icon-chevron-right right"></i></span></button>
-			</div>
+
 
 			<br>
 
@@ -82,7 +78,7 @@
 			</div>
 
 			<div class="submit">
-				<button type="submit" name="ptinvc_sync_form" class="button btn btn-default button-medium"><span>{l s='Save' mod='prestatokeyinvoice'} <i class="icon-chevron-right right"></i></span></button>
+				<button type="submit" name="ptinvc_save_form" class="button btn btn-default button-medium"><span>{l s='Save' mod='prestatokeyinvoice'} <i class="icon-chevron-right right"></i></span></button>
 			</div>
 
 		</form>

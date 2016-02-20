@@ -77,52 +77,51 @@ class PrestaToKeyInvoice extends Module
     // Module configuration options
     public function processConfiguration()
     {
-        if (Tools::isSubmit('ptinvc_intgr_form')) {
+        if (Tools::isSubmit('ptinvc_save_form')) {
+
+            // enable/disable products syncronization with keyinvoice
+            ConfigsValidation::setSyncProducts(Tools::getValue('enable_products_sync'));
+            // enable/disable clients syncronization with keyinvoice
+            ConfigsValidation::setSyncClients(Tools::getValue('enable_clients_sync'));
+            // enable/disable orders syncronization with keyinvoice
+            ConfigsValidation::setSyncOrders(Tools::getValue('enable_orders_sync'));
+
             // API Webservice URL
             $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
             $kiapi_key = Tools::getValue('kiapi_key');
-            // try comunication with WS
+
             try {
+                // try comunication with WS
                 $client = new SoapClient($url);
                 // see if key is valid before update config
                 if ($kiapi_key) {
 
                     $kiapi_auth =  $client->authenticate("$kiapi_key");
                     $result = $kiapi_auth[0];
+
                     if ($result == '1') {
                         Configuration::updateValue(_DB_PREFIX_.'PTINVC_KIAPI', $kiapi_key);
                         $this->context->smarty->assign('confirmation_key', 'ok');
                     } else {
                         Configuration::deleteByName(_DB_PREFIX_.'PTINVC_KIAPI');
+                        // disable syncronization on error
+                        ConfigsValidation::disableSyncronization();
                         $this->context->smarty->assign('no_confirmation_key', 'nok');
                     }
 
                 } else {
                     // Delete configuration values
                     Configuration::deleteByName(_DB_PREFIX_.'PTINVC_KIAPI');
+                    // disable syncronization on error
+                    ConfigsValidation::disableSyncronization();
                     $this->context->smarty->assign('no_configuration_key', 'na');
                 }
 
             } catch (Exception $e){
+                // disable syncronization on error
+                ConfigsValidation::disableSyncronization();
                 $this->context->smarty->assign('no_soap', 'nok');
             }
-        }
-
-        if (Tools::isSubmit('ptinvc_sync_form')) {
-            // enable/disable products syncronization with keyinvoice
-            $enable_products_sync = Tools::getValue('enable_products_sync');
-            Configuration::updateValue('PRESTATOKEYINVOICE_PRODUCTS_SYNC', $enable_products_sync);
-
-            // enable/disable clients syncronization with keyinvoice
-            $enable_clients_sync = Tools::getValue('enable_clients_sync');
-            Configuration::updateValue('PRESTATOKEYINVOICE_CLIENTS_SYNC', $enable_clients_sync);
-
-            // enable/disable orders syncronization with keyinvoice
-            $enable_orders_sync = Tools::getValue('enable_orders_sync');
-            Configuration::updateValue('PRESTATOKEYINVOICE_ORDERS_SYNC', $enable_orders_sync);
-
-
-            $this->context->smarty->assign('keyinvoice_sync_update', 'ok');
         }
     }
 
@@ -151,13 +150,6 @@ class PrestaToKeyInvoice extends Module
         return $this->display(__FILE__, 'getContent.tpl');
     }
 
-    /* 
-     * TODO restantes opcoes de configuracao do modulo 
-     * ser possivel ligar desligar sincronismo de: 
-     * produtos (DONE)
-     * clientes (DONE)
-     * encomendas (DONE)
-     * */
     ##################################### Module Config End ##############################################
 
     // vai buscar reposta do webservice que já estão na bd local.
@@ -233,26 +225,31 @@ class PrestaToKeyInvoice extends Module
             $ref = isset($product->reference) ? $product->reference : 'N/A';
             $designation = isset($product->name) ?  reset($product->name) : 'N/A';
             $shortName = 'N/A';
-            $tax = isset($product->tax_rate) ? $product->tax_rate : 'N/A';
-            $obs = "Produto inserido via PrestaToKeyinvoice";
-            $isService = isset($product->is_virtual) ? $product->is_virtual : 'N/A';
-            $hasStocks = isset($product->is_virtual) ? ((int)$product->getQuantity($id_product) == 0 ? '0' : '1') : '0';
-            $active= isset($product->active) ? $product->active : '1';
-            $shortDesc = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
-            $longDesc = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
-            $price = isset($product->price) ? $product->price : 'N/A';
-            $vendorRef = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
-            $ean = isset($product->ean13) ? $product->ean13 : 'N/A';
+
+            $taxValue = $product->getIdTaxRulesGroup();
+            $tax        = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByID($taxValue) : '';
+
+            $obs        = "Produto inserido via PrestaToKeyinvoice";
+            $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
+            $hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($id_product) == 0 ? '0' : '1') : '0';
+            $active     = isset($product->active) ? $product->active : '1';
+            $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
+            $longDesc   = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
+            $price      = isset($product->price) ? $product->price : '';
+            $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
+            $ean        = isset($product->ean13) ? $product->ean13 : '';
             
             $result=$this->upsertProduct($kiapi_key, $ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
-            //$this->getWSResponse($result);
 
-            /*
-             * TODO
-             *  Caso seja erro enviar o codigo do erro para o ecrã a mensagem tem de ser formatada.
-             * */
-            $this->sendWSErrorResponse($result);
+            if ($result != '1')
+            {
+                $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                $this->sendWSErrorResponse($result);
+            }
+
         }
+
+        return true;
     }
 
     ###### primeira abordagem que nao funcionou na versao presta 1.6.0.9 ###############
