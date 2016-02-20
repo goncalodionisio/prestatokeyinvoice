@@ -164,7 +164,7 @@ class PrestaToKeyInvoice extends Module
     {
         if (count($result) > 0 && $result[0] != '1')
         {
-            $message = (count($result) == 1) ? $result : ($result[0] . " - " . $result[1]);
+            $message = (count($result) == 1) ? $result[0] : ($result[0] . " - " . $result[1]);
             $this->context->controller->errors[] =utf8_decode($message);
         }
     }
@@ -237,7 +237,7 @@ class PrestaToKeyInvoice extends Module
             
             $result=$this->upsertProduct($kiapi_key, $ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
 
-            if ($result != '1')
+            if (isset($result) && $result[0] != '1')
             {
                 $result[0] = utf8_encode($this->getWSResponse($result[0]));
                 $this->sendWSErrorResponse($result);
