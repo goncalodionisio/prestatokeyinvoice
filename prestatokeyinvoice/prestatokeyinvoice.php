@@ -157,7 +157,7 @@ class PrestaToKeyInvoice extends Module
     {
        if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"'))
        {
-            return reset($message)['message'];
+            return reset($message);
        }
 
 
