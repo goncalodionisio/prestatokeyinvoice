@@ -155,13 +155,9 @@ class PrestaToKeyInvoice extends Module
     // vai buscar reposta do webservice que já estão na bd local.
     public function getWSResponse($result)
     {
-       if ($message = Db::getInstance()->executeS('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"'))
-       {
-            return reset($message);
-       }
+        $message = DB::getInstance()->getValue('SELECT message FROM `'._DB_PREFIX_.'prestatokeyinvoice_response` WHERE `code` = "'.(string)$result.'"');
 
-
-        return "Resposta indefinida!";
+        return isset($message) ? $message : "Resposta indefinida!";
     }
     
     public function sendWSErrorResponse($result)
@@ -246,7 +242,6 @@ class PrestaToKeyInvoice extends Module
                 $result[0] = utf8_encode($this->getWSResponse($result[0]));
                 $this->sendWSErrorResponse($result);
             }
-
         }
 
         return true;
