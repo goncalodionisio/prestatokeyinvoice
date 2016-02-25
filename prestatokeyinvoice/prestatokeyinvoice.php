@@ -2,6 +2,8 @@
 
 require('classes/ConfigsValidation.php');
 require('classes/GetValueByID.php');
+require('classes/ClientToKeyInvoice.php'); // client operations
+require('classes/ProductToKeyInvoice.php'); // product operations
 
 class PrestaToKeyInvoice extends Module
 {
@@ -31,7 +33,8 @@ class PrestaToKeyInvoice extends Module
         if (!$this->registerHook('displayAdminCustomers') ||
             !$this->registerHook('displayAdminOrder') ||
             !$this->registerHook('ActionProductSave') ||
-            !$this->registerHook('displayAdminProductsExtra')
+            !$this->registerHook('displayAdminProductsExtra') ||
+            !$this->registerHook('ActionObjectAddressUpdateAfter')
             )
             return false;
 
@@ -168,34 +171,6 @@ class PrestaToKeyInvoice extends Module
             $this->context->controller->errors[] =utf8_decode($message);
         }
     }
-    
-    public function upsertProduct($kiapi_key,$ref,$designation, $shortName, $tax, $obs,$isService, $hasStocks, $active,$shortDesc, $longDesc, $price,$vendorRef,$ean)
-    {
-        $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
-        $client = new SoapClient($url);
-        // see if key is valid before update config
-        $kiapi_auth =  $client->authenticate("$kiapi_key");
-        $session = $kiapi_auth[1];
-
-        // check if exists to always upsert
-        $productExists=$client->productExists("$session", "$ref");
-        $result = $productExists[0];
-
-        if ($result == 1) {
-
-            $result = $client->updateProduct("$session", "$ref","$designation", "$shortName", "$tax", "$obs","$isService", "$hasStocks", "$active","$shortDesc", "$longDesc", "$price","$vendorRef", "$ean");
-
-        } else {
-
-            $result = $client->insertProduct("$session", "$ref","$designation", "$shortName", "$tax", "$obs","$isService", "$hasStocks", "$active","$shortDesc", "$longDesc", "$price","$vendorRef", "$ean");
-        }
-
-        return $result;
-    }
-
-    /*
-        TODO public function upsertCustomer(){}
-    */
 
     // on product save action
     public function hookActionProductSave()
@@ -217,25 +192,7 @@ class PrestaToKeyInvoice extends Module
 
         if (Validate::isLoadedObject($product = new Product($id_product))) {
 
-            $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
-            $ref = isset($product->reference) ? $product->reference : 'N/A';
-            $designation = isset($product->name) ?  reset($product->name) : 'N/A';
-            $shortName = 'N/A';
-
-            $taxValue = $product->getIdTaxRulesGroup();
-            $tax        = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByID($taxValue) : '';
-
-            $obs        = "Produto inserido via PrestaToKeyinvoice";
-            $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
-            $hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($id_product) == 0 ? '0' : '1') : '0';
-            $active     = isset($product->active) ? $product->active : '1';
-            $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
-            $longDesc   = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
-            $price      = isset($product->price) ? $product->price : '';
-            $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
-            $ean        = isset($product->ean13) ? $product->ean13 : '';
-            
-            $result=$this->upsertProduct($kiapi_key, $ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
+            $result = ProductToKeyInvoice::save($product);
 
             if (isset($result) && $result[0] != '1')
             {
@@ -246,6 +203,38 @@ class PrestaToKeyInvoice extends Module
 
         return true;
     }
+
+    // on address save action
+    public function hookActionObjectAddressUpdateAfter($params)
+    {
+        // sai se não for para sincronizar com a api dos produtos
+        if (!ConfigsValidation::syncClients())
+        {
+            return false;
+        }
+
+        // Se a chave não existir coloca mensagem para o ecrã e sai
+        if (!ConfigsValidation::kiApiKeyExists())
+        {
+            $this->context->controller->errors[] = 'API_Key not defined';
+            return false;
+        }
+
+        if ($params["object"] instanceof Address) {
+            $address = $params["object"];
+
+            $result = ClientToKeyInvoice::save($address);
+
+            if (isset($result) && $result[0] != '1')
+            {
+                $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                $this->sendWSErrorResponse($result);
+            }
+        }
+
+        return true;
+    }
+
 
     ###### primeira abordagem que nao funcionou na versao presta 1.6.0.9 ###############
     
@@ -311,7 +300,6 @@ class PrestaToKeyInvoice extends Module
         }
     }
 
-    
     public function hookDisplayAdminProductsExtra()
     {
            $this->processProduct();
@@ -322,6 +310,9 @@ class PrestaToKeyInvoice extends Module
     }
     
     ########################## fim primeira abordagem que nao funcionou no presta 1.6.0.9 ########################################
+
+
+    ########################## Clients ########################################
 
     public function assignClientTabContent()
     {
@@ -424,6 +415,8 @@ class PrestaToKeyInvoice extends Module
         return $this->display(__FILE__, 'displayAdminCustomers.tpl');
     
     }
+
+
 
     /*
     TODO
