@@ -57,6 +57,9 @@ class ClientToKeyInvoice extends Module
         $fax = "";
         $email = "";
 
+        if ($vat == "")
+            return array(0, "numero VAT tem de ser preenchido");
+
         // se o vat number não estiver preenchido então enviar erro.
 
         //$country_code = DB::getInstance()->getValue("SELECT iso_code FROM "._DB_PREFIX_."country a, "._DB_PREFIX_."country_lang b WHERE a.id_country = b.id_country and b.name = '".$country."'");
