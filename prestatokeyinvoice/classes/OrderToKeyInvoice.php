@@ -7,17 +7,6 @@ class OrderToKeyInvoice extends Module
 	{
 		if (Validate::isLoadedObject($order = new OrderCore($id_order))) {
 			
-			// get what you need
-			$address_invoice = new AddressCore($order->id_address_invoice);
-			ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
-			
-			$vat_number = $address_invoice->vat_number;
-			
-			$cartProducts = $order->getCartProducts();
-			$shipping = $order->getShipping();
-			$order_reference = 'PTKI_'.$order->reference;
-			$getDocTypeShip = Tools::getValue('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
-			$getDocTypeInv  = Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE');
 			
 			if (Tools::isSubmit('process_sync_order'))
             {
@@ -30,41 +19,47 @@ class OrderToKeyInvoice extends Module
                 // see if key is valid before update config
                 $kiapi_auth =  $client->authenticate("$kiapi_key");
                 $session = $kiapi_auth[1];
-
+				
+				$getDocTypeShip = Tools::getValue('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
+			    $getDocTypeInv  = Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE');
+				$address_invoice = new AddressCore($order->id_address_invoice);
+				
+				// upsert customer
+				ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
+				$vat_number = $address_invoice->vat_number;
+				$order_reference = 'PTKI_'.$order->reference;
+				
+				// create document
                 $result = $client->insertDocumentHeader("$session", "$vat_number", "$getDocTypeShip", "","","", "", "", "", "$order_reference"); 
                 $docID = $result[1];
-				/*
-                if (isset($result) && $result[0] != '1')
+		        if (isset($result) && $result[0] != '1')
 		        {
-		            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-		            $this->sendWSErrorResponse($result);
+		            return $result;
 		        }
-                */
+   				
+				// add products
                 if ($result[0] == '1') {
 	                // produtos
+	                $cartProducts = $order->getCartProducts();
 	                foreach ($cartProducts as $cartProduct) {
 
 	                	$result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id']);
 	                    //$tax_rate = PrestaToKeyInvoiceGetValueByID::getTaxByID($cartProduct['id_tax_rules_group']);
 	                    //$result = ProductToKeyInvoice::upsertProduct($cartProduct['product_reference'], $cartProduct['product_name'], "N/A", "$tax_rate", "Produto inserido via PrestaToKeyinvoice", $cartProduct['is_virtual'], "1", $cartProduct['active'], "N/A", "N/A", $cartProduct['product_price'], "N/A", $cartProduct['ean13']);
-    	                /*
-    	                if (isset($result) && $result[0] != '1')
+				        if (isset($result) && $result[0] != '1')
 				        {
-				            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-				            $this->sendWSErrorResponse($result);
+				            return $result;
 				        }
-	                    */
 	                    $result = $client->insertDocumentLine("$session", "$docID", "$getDocTypeShip", $cartProduct['product_reference'], $cartProduct['product_quantity'], "", "", "", "");
-    	                /*
-    	                if (isset($result) && $result[0] != '1')
+				        if (isset($result) && $result[0] != '1')
 				        {
-				            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-				            $this->sendWSErrorResponse($result);
+				            return $result;
 				        }
-						 */
 	                }
                     
+					// sync shipping
 					// retira o produto criado como transporta no lado do key
+					$shipping = $order->getShipping();
 					$shipping_reference = Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
 					$result=$client->getProduct("$session", "$shipping_reference");
 
@@ -82,25 +77,22 @@ class OrderToKeyInvoice extends Module
 					$Price     = isset($shipping[0]['shipping_cost_tax_excl']) ? $shipping[0]['shipping_cost_tax_excl'] : '0.000000';
 					$EAN     = isset($result->{"DAT"}[0]->EAN) ? $result->{"DAT"}[0]->EAN : '';
 				
-					// este produto n existe no presta so no keyinvoice nao se pode usar o metodo por ID
+					// trasportadoras - este produto n existe no presta so no keyinvoice nao se pode usar o metodo por ID
 					$result = ProductToKeyInvoice::upsertProduct("$Ref", "$Name", "$ShortName", "$TAX", "$Obs", "$IsService", "$HasStocks", "$Active", "$ShortDescription", "$LongDescription", "$Price", "$VendorRef", "$EAN");
-	                /*
-	                if (isset($result) && $result[0] != '1')
+			        if (isset($result) && $result[0] != '1')
 			        {
-			            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-			            $this->sendWSErrorResponse($result);
+			            return $result;
 			        }
-					*/
+					// custo trasportadoras
 				    $result = $client->insertDocumentLine("$session", "$docID", "$getDocTypeShip", "$Ref", "1", "", "", "", "");
-	                /*
-	                if (isset($result) && $result[0] != '1')
+			        if (isset($result) && $result[0] != '1')
 			        {
-			            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-			            $this->sendWSErrorResponse($result);
+			            return $result;
 			        }
-					*/
 				}
-            }	
+				return $result;
+            }
+			
 		}
 	}
 }

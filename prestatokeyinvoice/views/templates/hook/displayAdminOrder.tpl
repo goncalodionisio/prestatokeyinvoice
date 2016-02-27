@@ -1,4 +1,7 @@
 <div class="panel col-lg-6">
+{if isset($confirmation_ok)}
+    <div class="alert alert-success">{l s='Order status ok' mod='prestatokeyinvoice'}</div>
+{/if}
 <h3 class="tab"> <i class="icon-info"></i> {l s='Presta To KeyInvoice' mod='prestatokeyinvoice'}</h3>
 <div class="form-group clearfix">
 	<form action="" method="post" id="send-order-keyinvoice" >

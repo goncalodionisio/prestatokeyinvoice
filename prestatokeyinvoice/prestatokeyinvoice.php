@@ -294,9 +294,18 @@ class PrestaToKeyInvoice extends Module
 		$this->assignDocTypeShip();
 		$this->assignDocTypeInv();
 
-		OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
+		$result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
+        if (isset($result) && $result[0] != '1')
+        {
+            $result[0] = utf8_encode($this->getWSResponse($result[0]));
+            $this->sendWSErrorResponse($result);
+			
+        } elseif (isset($result) && $result[0] == '1') {
+        	
+			$this->context->smarty->assign('confirmation_ok', $result);
+        }
 
-            return $this->display(__FILE__, 'displayAdminOrder.tpl');
+         return $this->display(__FILE__, 'displayAdminOrder.tpl');
     }
 
 }
