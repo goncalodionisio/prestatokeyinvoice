@@ -5,7 +5,7 @@ class ClientToKeyInvoice extends Module
 
     public static function upsertClient($nif, $country, $name, $address, $postalCode, $locality, $phone, $fax, $email, $obs)
     {
-        $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+        $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
 
         $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
         $client = new SoapClient($url);

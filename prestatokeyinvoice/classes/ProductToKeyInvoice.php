@@ -5,7 +5,7 @@ class ProductToKeyInvoice extends Module
 
     public static function upsertProduct($ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean)
     {
-        $kiapi_key = Configuration::get(_DB_PREFIX_.'PTINVC_KIAPI');
+        $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
 
         $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
         $client = new SoapClient($url);
