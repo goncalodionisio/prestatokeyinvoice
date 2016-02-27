@@ -190,15 +190,12 @@ class PrestaToKeyInvoice extends Module
 
         $id_product = (int)Tools::getValue('id_product');
 
-        if (Validate::isLoadedObject($product = new Product($id_product))) {
+        $result = ProductToKeyInvoice::saveByIdProduct($id_product);
 
-            $result = ProductToKeyInvoice::save($product);
-
-            if (isset($result) && $result[0] != '1')
-            {
-                $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                $this->sendWSErrorResponse($result);
-            }
+        if (isset($result) && $result[0] != '1')
+        {
+            $result[0] = utf8_encode($this->getWSResponse($result[0]));
+            $this->sendWSErrorResponse($result);
         }
 
         return true;
@@ -221,9 +218,7 @@ class PrestaToKeyInvoice extends Module
         }
 
         if ($params["object"] instanceof Address) {
-            $address = $params["object"];
-
-            $result = ClientToKeyInvoice::save($address);
+            $result = ClientToKeyInvoice::saveByIdAddress($params['object']->id);
 
             if (isset($result) && $result[0] != '1')
             {

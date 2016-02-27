@@ -31,7 +31,7 @@ class ClientToKeyInvoice extends Module
         return $result;
     }
 
-    public static function save($address) {
+    public static function saveByAddressObject($address) {
 
         $company    = isset($address->company) ? $address->company : "";
         $first_name = isset($address->firstname) ? $address->firstname : "";
@@ -66,5 +66,14 @@ class ClientToKeyInvoice extends Module
         $country_code = "PT";
 
         return ClientToKeyInvoice::upsertClient($vat, $country_code, $name, $address, $postcode, $locality, $phone, $fax, $email, $obs);
+    }
+
+    public static function saveByIdAddress($idAddress)
+    {
+        if (Validate::isLoadedObject($address = new Address($idAddress))) {
+            return ClientToKeyInvoice::saveByAddressObject($address);
+        }
+
+        return null;
     }
 }

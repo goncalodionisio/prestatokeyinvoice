@@ -29,7 +29,7 @@ class ProductToKeyInvoice extends Module
         return $result;
     }
 
-    public static function save($product)
+    public static function saveByProductObject($product)
     {
         $ref = isset($product->reference) ? $product->reference : 'N/A';
         $designation = isset($product->name) ?  reset($product->name) : 'N/A';
@@ -49,6 +49,15 @@ class ProductToKeyInvoice extends Module
         $ean        = isset($product->ean13) ? $product->ean13 : '';
 
         return ProductToKeyInvoice::upsertProduct($ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean);
+    }
+
+    public static function saveByIdProduct($idProduct)
+    {
+        if (Validate::isLoadedObject($product = new Product($idProduct))) {
+            return ProductToKeyInvoice::saveByProductObject($product);
+        }
+
+        return null;
     }
 
 }
