@@ -104,21 +104,23 @@
 	                    <label for="'enable_orders_sync_0" class="t">{l s='No' mod='prestatokeyinvoice'}</label>
 	                </div>
 	                <div class="form-group clearfix">
-	                    <label for="">{l s='Default Shipping docType' mod='prestatokeyinvoice'}:</label>
+	                    <label for="">{l s='Default docType' mod='prestatokeyinvoice'}:</label>
 	                    {if $enable_orders_sync eq 1}
 	                        {html_options name=PRESTATOKEYINVOICE_SHIP_DOC_TYPE options=$ShipdocOptions selected=$ShipdefaultSelect}
 	                    {else}
 	                        {html_options name=PRESTATOKEYINVOICE_SHIP_DOC_TYPE disabled="disabled" options=$ShipdocOptions selected=$ShipdefaultSelect}
 	                    {/if}
 	                </div>
+	                {*
 	                <div class="form-group clearfix">
-	                    <label for="">{l s='Default Invoice docType' mod='prestatokeyinvoice'}:</label>
+	                    <label for="">{l s='Default docType' mod='prestatokeyinvoice'}:</label>
 	                    {if $enable_orders_sync eq 1}
 	                        {html_options name=PRESTATOKEYINVOICE_INV_DOC_TYPE options=$InvdocOptions selected=$InvdefaultSelect}
 	                     {else}   
 	                        {html_options name=PRESTATOKEYINVOICE_INV_DOC_TYPE disabled="disabled" options=$InvdocOptions selected=$InvdefaultSelect}
 	                     {/if}
 	                </div>
+	                *}
 	            </fielset>
 	        </div>
 	        <div class="col-lg-6">

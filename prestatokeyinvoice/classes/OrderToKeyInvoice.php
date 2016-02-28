@@ -21,7 +21,7 @@ class OrderToKeyInvoice extends Module
                 $session = $kiapi_auth[1];
 				
 				$getDocTypeShip = Tools::getValue('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
-			    $getDocTypeInv  = Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE');
+			    //$getDocTypeInv  = Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE');
 				$address_invoice = new AddressCore($order->id_address_invoice);
 				
 				// upsert customer

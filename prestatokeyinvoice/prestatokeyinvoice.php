@@ -99,9 +99,12 @@ class PrestaToKeyInvoice extends Module
         $defaultSelect = isset($getDoctype) ? $getDoctype : '13';
 		
 		$this->context->smarty->assign('ShipdocOptions', array(
+            4 => 'Factura',
+            5 => 'Venda a Dinheiro',
             13 => 'Encomenda',
             15 => 'Guia de Remessa',
-            16 => 'Guia de Transporte')
+			32 => 'Factura Simplificada',
+            34 => 'Factura-Recibo')
         );
         $this->context->smarty->assign('ShipdefaultSelect', $defaultSelect);
     }
@@ -292,7 +295,7 @@ class PrestaToKeyInvoice extends Module
 
 		// doctype drop box
 		$this->assignDocTypeShip();
-		$this->assignDocTypeInv();
+		//$this->assignDocTypeInv();
 
 		$result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
         if (isset($result) && $result[0] != '1')
