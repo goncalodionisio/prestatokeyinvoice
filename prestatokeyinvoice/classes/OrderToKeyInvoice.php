@@ -25,7 +25,12 @@ class OrderToKeyInvoice extends Module
 				$address_invoice = new AddressCore($order->id_address_invoice);
 				
 				// upsert customer
-				ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
+				$result = ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
+		        if (isset($result) && $result[0] != '1')
+		        {
+			    	return $result;
+	        	}
+
 				$vat_number = $address_invoice->vat_number;
 				$order_reference = 'PTKI_'.$order->reference;
 				
@@ -42,8 +47,9 @@ class OrderToKeyInvoice extends Module
 	                // produtos
 	                $cartProducts = $order->getCartProducts();
 	                foreach ($cartProducts as $cartProduct) {
-
-	                	$result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id']);
+						$OrderPrice = $cartProduct['product_price'];
+						$result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id']);
+	                	//$result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id'],$OrderPrice);
 	                    //$tax_rate = PrestaToKeyInvoiceGetValueByID::getTaxByID($cartProduct['id_tax_rules_group']);
 	                    //$result = ProductToKeyInvoice::upsertProduct($cartProduct['product_reference'], $cartProduct['product_name'], "N/A", "$tax_rate", "Produto inserido via PrestaToKeyinvoice", $cartProduct['is_virtual'], "1", $cartProduct['active'], "N/A", "N/A", $cartProduct['product_price'], "N/A", $cartProduct['ean13']);
 				        if (isset($result) && $result[0] != '1')
