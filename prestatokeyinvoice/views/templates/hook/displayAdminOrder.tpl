@@ -26,7 +26,7 @@
 
 </div>
 {if isset($confirmation_ok)}
-    <div class="alert alert-success">{l s='Order status ok' mod='prestatokeyinvoice'}</div>
+    <div class="alert alert-success">{l s='Order Created in Keyinvoice' mod='prestatokeyinvoice'}</div>
 {/if}
 {*
 <br>############## teste_customer <br>

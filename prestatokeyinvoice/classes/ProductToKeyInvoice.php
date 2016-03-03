@@ -5,14 +5,13 @@ class ProductToKeyInvoice extends Module
 
     public static function upsertProduct($ref, $designation, $shortName, $tax, $obs, $isService, $hasStocks, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean)
     {
-        $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
-
-        $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
-        $client = new SoapClient($url);
-        // see if key is valid before update config
-        $kiapi_auth =  $client->authenticate("$kiapi_key");
-        $session = $kiapi_auth[1];
-
+        
+        if (!$client = ConfigsValidation::APIWSClient())
+            return false;
+        
+        if (!$session = ConfigsValidation::APIWSSession($client, 'ProductToKeyInvoice'))
+            return false;
+        
         // check if exists to always upsert
         $productExists=$client->productExists("$session", "$ref");
         $result = $productExists[0];

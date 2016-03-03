@@ -74,16 +74,15 @@ class PrestaToKeyInvoice extends Module
         // Return result
         return $result;
     }
-	
+    
     public function assignDocTypeInv()
     {
 
-    	$getDoctype = Configuration::get('PRESTATOKEYINVOICE_INV_DOC_TYPE');
+        $getDoctype = Configuration::get('PRESTATOKEYINVOICE_INV_DOC_TYPE');
         $defaultSelect = isset($getDoctype) ? $getDoctype : '13';
-		
-		$this->context->smarty->assign('InvdocOptions', array(
+        
+        $this->context->smarty->assign('InvdocOptions', array(
             4 => 'Factura',
-            5 => 'Venda a Dinheiro',
             7 => 'Nota de Crédito',
             13 => 'Encomenda',
             32 => 'Factura Simplificada',
@@ -91,19 +90,18 @@ class PrestaToKeyInvoice extends Module
         );
         $this->context->smarty->assign('InvdefaultSelect', $defaultSelect);
     }
-	
-	public function assignDocTypeShip()
+    
+    public function assignDocTypeShip()
     {
 
-    	$getDoctype = Configuration::get('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
+        $getDoctype = Configuration::get('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
         $defaultSelect = isset($getDoctype) ? $getDoctype : '13';
-		
-		$this->context->smarty->assign('ShipdocOptions', array(
+        
+        $this->context->smarty->assign('ShipdocOptions', array(
             4 => 'Factura',
-            5 => 'Venda a Dinheiro',
             13 => 'Encomenda',
             15 => 'Guia de Remessa',
-			32 => 'Factura Simplificada',
+            32 => 'Factura Simplificada',
             34 => 'Factura-Recibo')
         );
         $this->context->smarty->assign('ShipdefaultSelect', $defaultSelect);
@@ -120,45 +118,40 @@ class PrestaToKeyInvoice extends Module
             ConfigsValidation::setSyncClients(Tools::getValue('enable_clients_sync'));
             // enable/disable orders syncronization with keyinvoice
             ConfigsValidation::setSyncOrders(Tools::getValue('enable_orders_sync'));
-			// choose doctype to sync by default
+            // choose doctype to sync by default
             ConfigsValidation::setDocTypeShip(Tools::getValue('PRESTATOKEYINVOICE_SHIP_DOC_TYPE'));
-			ConfigsValidation::setDocTypeInv(Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE'));
-			// configure doc reference for shipping cost
-			ConfigsValidation::setShippingCostProduct(Tools::getValue('PRESTATOKEYINVOICE_SHIPPINGCOST'));
-            // API Webservice URL
-            $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
-            $kiapi_key = Tools::getValue('kiapi_key');
-
-            try {
-                // try comunication with WS
-                $client = new SoapClient($url);
-                // see if key is valid before update config
-                if ($kiapi_key) {
-
-                    $kiapi_auth =  $client->authenticate("$kiapi_key");
-                    $result = $kiapi_auth[0];
-
-                    if ($result == '1') {
-                        Configuration::updateValue('PRESTATOKEYINVOICE_KIAPI', $kiapi_key);
-                        $this->context->smarty->assign('confirmation_key', 'ok');
-                    } else {
-						// Delete configuration values
-                        ConfigsValidation::deleteByName();
-                        $this->context->smarty->assign('no_confirmation_key', 'nok');
-                    }
-
-                } else {
-                	
-					// Delete configuration values
-                    ConfigsValidation::deleteByName();
-                    $this->context->smarty->assign('no_configuration_key', 'na');
-                }
-
-            } catch (Exception $e) {
-            	
-				// Delete configuration values
+            ConfigsValidation::setDocTypeInv(Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE'));
+            // configure doc reference for shipping cost
+            ConfigsValidation::setShippingCostProduct(Tools::getValue('PRESTATOKEYINVOICE_SHIPPINGCOST'));
+            
+            // check key
+            if (!$kiapi_key = Tools::getValue('PRESTATOKEYINVOICE_KIAPI')) {
+                
+                $this->context->smarty->assign('no_configuration_key', 'na');
                 ConfigsValidation::deleteByName();
+                return false;
+            }
+            
+            // check soap
+            if (!$client = ConfigsValidation::APIWSClient()) {
+                
                 $this->context->smarty->assign('no_soap', 'nok');
+                ConfigsValidation::deleteByName();
+                return false;
+                
+            }
+            
+            // check session
+            if (!$session = ConfigsValidation::APIWSSession($client, 'getContent')) {
+                
+                $this->context->smarty->assign('no_confirmation_key', 'nok');
+                ConfigsValidation::deleteByName();
+                return false;
+                
+            } else {
+                
+                ConfigsValidation::setkiapi(Tools::getValue('PRESTATOKEYINVOICE_KIAPI'));
+                $this->context->smarty->assign('confirmation_key', 'ok');
             }
         }
     }
@@ -166,7 +159,7 @@ class PrestaToKeyInvoice extends Module
     public function assignConfiguration()
     {
         $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
-        $this->context->smarty->assign('kiapi_key', $kiapi_key);
+        $this->context->smarty->assign('PRESTATOKEYINVOICE_KIAPI', $kiapi_key);
 
         // enable/disable products syncronization with keyinvoice
         $enable_products_sync = Configuration::get('PRESTATOKEYINVOICE_PRODUCTS_SYNC');
@@ -179,13 +172,13 @@ class PrestaToKeyInvoice extends Module
         // enable/disable orders syncronization with keyinvoice
         $enable_orders_sync = Configuration::get('PRESTATOKEYINVOICE_ORDERS_SYNC');
         $this->context->smarty->assign('enable_orders_sync', $enable_orders_sync);
-		
-		$PRESTATOKEYINVOICE_SHIPPINGCOST = Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
+        
+        $PRESTATOKEYINVOICE_SHIPPINGCOST = Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
         $this->context->smarty->assign('PRESTATOKEYINVOICE_SHIPPINGCOST', $PRESTATOKEYINVOICE_SHIPPINGCOST);
-		
-		// doctype drop box
-		$this->assignDocTypeShip();
-		$this->assignDocTypeInv();
+        
+        // doctype drop box
+        $this->assignDocTypeShip();
+        $this->assignDocTypeInv();
     }
 
     public function getContent()
@@ -293,19 +286,19 @@ class PrestaToKeyInvoice extends Module
 
         $id_order = (int)Tools::getValue('id_order');
 
-		// doctype drop box
-		$this->assignDocTypeShip();
-		//$this->assignDocTypeInv();
+        // doctype drop box
+        $this->assignDocTypeShip();
+        //$this->assignDocTypeInv();
 
-		$result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
+        $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
         if (isset($result) && $result[0] != '1')
         {
             $result[0] = utf8_encode($this->getWSResponse($result[0]));
             $this->sendWSErrorResponse($result);
-			
+            
         } elseif (isset($result) && $result[0] == '1') {
-        	
-			$this->context->smarty->assign('confirmation_ok', $result);
+            
+            $this->context->smarty->assign('confirmation_ok', $result);
         }
 
          return $this->display(__FILE__, 'displayAdminOrder.tpl');

@@ -5,14 +5,13 @@ class ClientToKeyInvoice extends Module
 
     public static function upsertClient($nif, $country, $name, $address, $postalCode, $locality, $phone, $fax, $email, $obs)
     {
-        $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
 
-        $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
-        $client = new SoapClient($url);
-        // see if key is valid before update config
-        $kiapi_auth =  $client->authenticate("$kiapi_key");
-        $session = $kiapi_auth[1];
-
+        if (!$client = ConfigsValidation::APIWSClient())
+            return false;
+        
+        if (!$session = ConfigsValidation::APIWSSession($client, 'ClientToKeyInvoice'))
+            return false;
+        
         // check if exists to always upsert
         $clientExists = $client->clientExists("$session", "$nif");
         $result = $clientExists[0];

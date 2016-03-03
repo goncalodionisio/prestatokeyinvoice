@@ -22,10 +22,10 @@
 	            <legend>KIAPI Key:</legend>
 	                <div class="form-group clearfix">
 	                    <div class="col-lg-10">
-	                        <input type="text" placeholder="kiapi_key" id="kiapi_key" name="kiapi_key" value="{$kiapi_key|escape:'htmlall':'UTF-8'}" />
+	                        <input type="text" placeholder="kiapi_key" id="kiapi_key" name="PRESTATOKEYINVOICE_KIAPI" value="{$PRESTATOKEYINVOICE_KIAPI|escape:'htmlall':'UTF-8'}" />
 	                     </div>
 	                     <div class="col-lg-2">   
-	                        {if empty($kiapi_key) and empty($no_confirmation_key) }
+	                        {if empty($PRESTATOKEYINVOICE_KIAPI) and empty($no_confirmation_key) }
 	                            <img src="../img/admin/status_orange.png" alt="" />
 	                        {elseif isset($no_confirmation_key)}
 	                            <img src="../img/admin/status_red.png" alt="" />

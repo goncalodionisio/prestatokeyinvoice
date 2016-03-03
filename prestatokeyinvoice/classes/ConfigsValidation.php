@@ -7,12 +7,57 @@
  */
 class ConfigsValidation extends Module
 {
+
+    /******************************************************
+     * Sessions
+     ******************************************************/
+    public static function APIWSClient() {
+        
+        try {
+            
+            $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
+            $client = new SoapClient($url);
+            return $client;
+            
+        } catch (Exception $e) {
+                
+            return false;
+        }
+        
+    }
+    
+    public static function APIWSSession($client,$from) {
+        
+        if ($from == 'getContent') {
+            
+            $kiapi_key = Tools::getValue('PRESTATOKEYINVOICE_KIAPI');
+            
+        } else {
+            
+            $kiapi_key = Configuration::get('PRESTATOKEYINVOICE_KIAPI');
+
+        }
+
+        $kiapi_auth =  $client->authenticate("$kiapi_key");
+        if ($kiapi_auth[0] != 1) {
+            
+            return false;
+        }
+    
+        $session = $kiapi_auth[1];
+        return $session;
+    }
+    
+    
+    /******************************************************
+     * Validations
+     ******************************************************/
     public static function kiApiKeyExists()
     {
         $kiapi_key = (string)Configuration::get('PRESTATOKEYINVOICE_KIAPI');
         return !(trim($kiapi_key) == "");
     }
-	
+    
     public static function shippingCostProductExists()
     {
         $shippingCostProduct = (string)Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
@@ -40,17 +85,17 @@ class ConfigsValidation extends Module
         ConfigsValidation::setSyncClients('0');
         ConfigsValidation::setSyncOrders('0');
     }
-	
-	
-	public static function deleteByName()
+    
+    
+    public static function deleteByName()
     {
         Configuration::deleteByName('PRESTATOKEYINVOICE_KIAPI');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_PRODUCTS_SYNC');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_CLIENTS_SYNC');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_ORDERS_SYNC');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_INV_DOC_TYPE');
-		Configuration::deleteByName('PRESTATOKEYINVOICE_SHIPPINGCOST');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_PRODUCTS_SYNC');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_CLIENTS_SYNC');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_ORDERS_SYNC');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_INV_DOC_TYPE');
+        Configuration::deleteByName('PRESTATOKEYINVOICE_SHIPPINGCOST');
     }
 
     /******************************************************
@@ -71,8 +116,8 @@ class ConfigsValidation extends Module
     {
         return (int)Configuration::get('PRESTATOKEYINVOICE_ORDERS_SYNC');
     }
-	
-	public static function getShippingCostProduct()
+    
+    public static function getShippingCostProduct()
     {
         return (int)Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
     }
@@ -80,6 +125,11 @@ class ConfigsValidation extends Module
     /******************************************************
      * Set Sync Functions
      ******************************************************/
+     
+    public static function setkiapi($value)
+    {
+        Configuration::updateValue('PRESTATOKEYINVOICE_KIAPI', $value);
+    }
 
     public static function setSyncProducts($value)
     {
@@ -105,7 +155,7 @@ class ConfigsValidation extends Module
     {
         Configuration::updateValue('PRESTATOKEYINVOICE_INV_DOC_TYPE', $value);
     }
-	
+    
     public static function setShippingCostProduct($value)
     {
         Configuration::updateValue('PRESTATOKEYINVOICE_SHIPPINGCOST', $value);
