@@ -32,29 +32,35 @@ class ClientToKeyInvoice extends Module
 
     public static function saveByAddressObject($address) {
 
-        $company    = isset($address->company) ? $address->company : "";
-        $first_name = isset($address->firstname) ? $address->firstname : "";
-        $last_name  = isset($address->lastname) ? $address->lastname : "";
+        $company    = isset($address->company) ? utf8_encode($address->company) : "";
 
-        $address1   = isset($address->address1) ? $address->address1 : "";
-        $address2   = isset($address->address2) ? $address->address2 : "";
+        $first_name = isset($address->firstname) ? utf8_encode($address->firstname) : "";
+        $last_name  = isset($address->lastname) ? utf8_encode($address->lastname) : "";
 
-        $nif        = isset($address->dni) ? $address->dni : "";
+        $address1   = isset($address->address1) ? utf8_encode($address->address1) : "";
+        $address2   = isset($address->address2) ? utf8_encode($address->address2) : "";
+
+        #$nif        = isset($address->dni) ? $address->dni : "";
         $vat        = isset($address->vat_number) ? $address->vat_number : "";
 
         $postcode   = isset($address->postcode) ? $address->postcode : "";
         $city       = isset($address->city) ? $address->city : "";
         $country    = isset($address->country) ? $address->country : "";
 
-        $obs        = isset($address->other) ? $address->other : "";
+        # $obs        = isset($address->other) ? $address->other : "";
+        $obs        = "Cliente criado via PrestaToKeyInvoice";
         $phone      = isset($address->phone) ? $address->phone : "";
 
         // transformações das colunas
-        $address = $address1 . ", " . $address2;
+        $full_address = $address1 . ", " . $address2;
         $name = $company == "" ? ($first_name . " " . $last_name) : $company;
         $locality = $city;
+        $postcode = $postcode ." ". $city;
         $fax = "";
-        $email = "";
+        $email = ""; # detail is empty
+
+        if (Validate::isLoadedObject($customer = new Customer($address->id_customer)))
+            $email = $customer->email;
 
         if ($vat == "")
             return array(0, "numero VAT tem de ser preenchido");
@@ -64,7 +70,7 @@ class ClientToKeyInvoice extends Module
         //$country_code = DB::getInstance()->getValue("SELECT iso_code FROM "._DB_PREFIX_."country a, "._DB_PREFIX_."country_lang b WHERE a.id_country = b.id_country and b.name = '".$country."'");
         $country_code = "PT";
 
-        return ClientToKeyInvoice::upsertClient($vat, $country_code, $name, $address, $postcode, $locality, $phone, $fax, $email, $obs);
+        return ClientToKeyInvoice::upsertClient($vat, $country_code, $name, $full_address, $postcode, $locality, $phone, $fax, $email, $obs);
     }
 
     public static function saveByIdAddress($idAddress)

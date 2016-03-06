@@ -31,11 +31,15 @@ class ProductToKeyInvoice extends Module
     public static function saveByProductObject($product)
     {
         $ref = isset($product->reference) ? $product->reference : 'N/A';
-        $designation = isset($product->name) ?  reset($product->name) : 'N/A';
+        $designation = isset($product->name) ?  utf8_encode(reset($product->name)) : 'N/A';
         $shortName = 'N/A';
 
         $taxValue = $product->getIdTaxRulesGroup();
-        $tax        = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByID($taxValue) : '';
+        # $tax      = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByID($taxValue) : ''; # old no tax rule group validation
+        $tax      = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByRulesGroup($taxValue) : '';
+
+        if ($tax == "") # if empty set 0 tax
+            $tax = "0";
 
         $obs        = "Produto inserido via PrestaToKeyinvoice";
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
