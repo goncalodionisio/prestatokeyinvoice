@@ -1,3 +1,18 @@
+{*
+/**
+ * NOTICE OF LICENSE
+ *
+ * This file is licenced under the Software License Agreement.
+ * With the purchase or the installation of the software in your application
+ * you accept the licence agreement.
+ *
+ * You must not modify, adapt or create derivative works of this source code
+ *
+ *  @author    Majoinfa - Sociedade Unipessoal Lda
+ *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ *  @license   LICENSE.txt
+ */
+*}
 <div class="panel col-lg-6">
 
 <h3 class="tab"> <i class="icon-info"></i> {l s='Presta To KeyInvoice' mod='prestatokeyinvoice'}</h3>

@@ -1,3 +1,18 @@
+
+/*
+ * NOTICE OF LICENSE
+ *
+ * This file is licenced under the Software License Agreement.
+ * With the purchase or the installation of the software in your application
+ * you accept the licence agreement.
+ *
+ * You must not modify, adapt or create derivative works of this source code
+ *
+ *  @author    Majoinfa - Sociedade Unipessoal Lda
+ *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ *  @license   LICENSE.txt
+ */
+ 
 CREATE TABLE IF NOT EXISTS `PREFIX_prestatokeyinvoice_response` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(4) NOT NULL,
