@@ -109,6 +109,7 @@
 	                        {html_options name=PRESTATOKEYINVOICE_SHIP_DOC_TYPE options=$ShipdocOptions selected=$ShipdefaultSelect}
 	                    {else}
 	                        {html_options name=PRESTATOKEYINVOICE_SHIP_DOC_TYPE disabled="disabled" options=$ShipdocOptions selected=$ShipdefaultSelect}
+	                        <input type="hidden" id="PRESTATOKEYINVOICE_SHIP_DOC_TYPE_hidden" name="PRESTATOKEYINVOICE_SHIP_DOC_TYPE" value="{13|escape:'htmlall':'UTF-8'}" />
 	                    {/if}
 	                </div>
 	                {*

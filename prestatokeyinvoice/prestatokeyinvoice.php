@@ -32,8 +32,9 @@ class PrestaToKeyInvoice extends Module
             return false;
 
         if (!$this->registerHook('displayAdminOrder') ||
-            !$this->registerHook('ActionProductSave') ||
-            !$this->registerHook('ActionObjectAddressUpdateAfter')
+            !$this->registerHook('actionProductSave') ||
+             !$this->registerHook('orderConfirmation') ||
+            !$this->registerHook('actionObjectAddressUpdateAfter')
             )
             return false;
 
@@ -265,10 +266,6 @@ class PrestaToKeyInvoice extends Module
         return true;
     }
 
-    /*
-    TODO
-    das encomendas, quase tudo, in progress
-    */
     public function hookDisplayAdminOrder()
     {
         // sai se não for para sincronizar com a api das encomendas
@@ -289,19 +286,41 @@ class PrestaToKeyInvoice extends Module
         // doctype drop box
         $this->assignDocTypeShip();
         //$this->assignDocTypeInv();
-
-        $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order);
-        if (isset($result) && $result[0] != '1')
+		if (Tools::isSubmit('process_sync_order'))
         {
-            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-            $this->sendWSErrorResponse($result);
-            
-        } elseif (isset($result) && $result[0] == '1') {
-            
-            $this->context->smarty->assign('confirmation_ok', $result);
-        }
+	        $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookDisplayAdminOrder');
+	        if (isset($result) && $result[0] != '1')
+	        {
+	            $result[0] = utf8_encode($this->getWSResponse($result[0]));
+	            $this->sendWSErrorResponse($result);
+	            
+	        } elseif (isset($result) && $result[0] == '1') {
+	            
+	            $this->context->smarty->assign('confirmation_ok', $result);
+	        }
+		}
 
          return $this->display(__FILE__, 'displayAdminOrder.tpl');
     }
+
+	// frontend
+	public function hookOrderConfirmation()
+	{
+        // sai se não for para sincronizar com a api das encomendas
+        if (!ConfigsValidation::syncOrders())
+        {
+            return false;
+        }
+        
+        // Se a chave não existir coloca mensagem para o ecrã e sai
+        if (!ConfigsValidation::kiApiKeyExists())
+        {
+            return false;
+        }
+
+        $id_order = (int)Tools::getValue('id_order');
+		OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookOrderConfirmation');
+		
+	}
 
 }
