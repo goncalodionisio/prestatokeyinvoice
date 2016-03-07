@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * NOTICE OF LICENSE
  *
  * This file is licenced under the Software License Agreement.
@@ -299,26 +299,26 @@ class PrestaToKeyInvoice extends Module
         // doctype drop box
         $this->assignDocTypeShip();
         //$this->assignDocTypeInv();
-		if (Tools::isSubmit('process_sync_order'))
+        if (Tools::isSubmit('process_sync_order'))
         {
-	        $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookDisplayAdminOrder');
-	        if (isset($result) && $result[0] != '1')
-	        {
-	            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-	            $this->sendWSErrorResponse($result);
-	            
-	        } elseif (isset($result) && $result[0] == '1') {
-	            
-	            $this->context->smarty->assign('confirmation_ok', $result);
-	        }
-		}
+            $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookDisplayAdminOrder');
+            if (isset($result) && $result[0] != '1')
+            {
+                $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                $this->sendWSErrorResponse($result);
+                
+            } elseif (isset($result) && $result[0] == '1') {
+                
+                $this->context->smarty->assign('confirmation_ok', $result);
+            }
+        }
 
          return $this->display(__FILE__, 'displayAdminOrder.tpl');
     }
 
-	// frontend
-	public function hookOrderConfirmation()
-	{
+    // frontend
+    public function hookOrderConfirmation()
+    {
         // sai se não for para sincronizar com a api das encomendas
         if (!ConfigsValidation::syncOrders())
         {
@@ -332,11 +332,11 @@ class PrestaToKeyInvoice extends Module
         }
 
         $id_order = (int)Tools::getValue('id_order');
-		OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookOrderConfirmation');
-		
-		/*
-		* TODO: notificar admin de orders nao sincronizadas via frontend
-		*/
-	}
+        OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookOrderConfirmation');
+        
+        /*
+        * TODO: notificar admin de orders nao sincronizadas via frontend
+        */
+    }
 
 }

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * NOTICE OF LICENSE
  *
  * This file is licenced under the Software License Agreement.
@@ -12,6 +12,7 @@
  *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
  *  @license   LICENSE.txt
  */
+ 
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{prestatokeyinvoice}prestashop>getcontent_ad3ce1128ea03ccbe064bb569bd98738'] = 'Activar sincronização de produtos';

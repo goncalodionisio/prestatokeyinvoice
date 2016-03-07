@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * NOTICE OF LICENSE
  *
  * This file is licenced under the Software License Agreement.
@@ -12,6 +12,7 @@
  *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
  *  @license   LICENSE.txt
  */
+ 
 /*
  * Date: 14-02-2016
  * Time: 16:23

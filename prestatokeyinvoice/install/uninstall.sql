@@ -11,4 +11,5 @@
  *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
  *  @license   LICENSE.txt
  */
+ 
  DROP TABLE `PREFIX_prestatokeyinvoice_response`;
