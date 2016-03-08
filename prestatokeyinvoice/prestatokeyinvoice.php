@@ -46,8 +46,9 @@ class PrestaToKeyInvoice extends Module
 
         if (!$this->registerHook('displayAdminOrder') ||
             !$this->registerHook('actionProductSave') ||
-             !$this->registerHook('orderConfirmation') ||
-            !$this->registerHook('actionObjectAddressUpdateAfter')
+            !$this->registerHook('orderConfirmation') ||
+            !$this->registerHook('actionObjectAddressUpdateAfter') ||
+            !$this->registerHook('actionObjectAddressAddAfter')
             )
             return false;
 
@@ -250,8 +251,7 @@ class PrestaToKeyInvoice extends Module
         return true;
     }
 
-    // on address save action
-    public function hookActionObjectAddressUpdateAfter($params)
+    public function addAndUpdateClients($params)
     {
         // sai se não for para sincronizar com a api dos produtos
         if (!ConfigsValidation::syncClients())
@@ -268,15 +268,31 @@ class PrestaToKeyInvoice extends Module
 
         if ($params["object"] instanceof Address) {
             $result = ClientToKeyInvoice::saveByIdAddress($params['object']->id);
+            $location = Dispatcher::getInstance()->getController(); // page location
 
-            if (isset($result) && $result[0] != '1')
+            if (isset($location) && $location == 'adminaddresses')
             {
-                $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                $this->sendWSErrorResponse($result);
+                if (isset($result) && $result[0] != '1')
+                {
+                    $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                    $this->sendWSErrorResponse($result);
+                }
             }
         }
 
         return true;
+    }
+
+    // on address add action
+    public function hookActionObjectAddressAddAfter($params)
+    {
+        PrestaToKeyInvoice::addAndUpdateClients($params);
+    }
+
+    // on address update action
+    public function hookActionObjectAddressUpdateAfter($params)
+    {
+        PrestaToKeyInvoice::addAndUpdateClients($params);
     }
 
     public function hookDisplayAdminOrder()
