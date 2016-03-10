@@ -48,7 +48,8 @@ class PrestaToKeyInvoice extends Module
             !$this->registerHook('actionProductSave') ||
             !$this->registerHook('orderConfirmation') ||
             !$this->registerHook('actionObjectAddressUpdateAfter') ||
-            !$this->registerHook('actionObjectAddressAddAfter')
+            !$this->registerHook('actionObjectAddressAddAfter') ||
+            !$this->registerHook('displayAdminCustomers')
             )
             return false;
 
@@ -330,6 +331,42 @@ class PrestaToKeyInvoice extends Module
         }
 
          return $this->display(__FILE__, 'displayAdminOrder.tpl');
+    }
+
+    public function hookDisplayAdminCustomers()
+    {
+        if (!$client = ConfigsValidation::APIWSClient())
+            return false;
+
+        if (!$session = ConfigsValidation::APIWSSession($client, 'ClientToKeyInvoice'))
+            return false;
+
+        if (Validate::isLoadedObject($customer = new Customer((int)Tools::getValue('id_customer'))))
+        {
+            $address_list = $customer->getAddresses($this->context->language->id);
+            $selected_address = "-1";
+
+            foreach($address_list as $addr) {
+                $vat_number = $addr['vat_number'];
+
+                $clientAddress = $client->getClient("$session", "$vat_number");
+
+                if ($clientAddress->DAT[0]->Address == ($addr['address1'] . ", " . $addr['address2']))
+                {
+                    $selected_address = $addr['id_address'];
+                }
+            }
+
+            $this->context->smarty->assign('selected_address', $selected_address);
+            $this->context->smarty->assign('address_list', $address_list);
+        }
+
+        if (Tools::isSubmit('keyinvoice_save_address'))
+        {
+            ClientToKeyInvoice::saveByIdAddress(Tools::getValue('keyinvoice_address_radio'));
+        }
+
+        return $this->display(__FILE__, 'displayAdminCustomers.tpl');
     }
 
     // frontend
