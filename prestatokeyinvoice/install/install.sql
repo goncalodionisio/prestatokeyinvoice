@@ -76,4 +76,5 @@ VALUES
 ('-525','Não foi possível apagar a moeda.'),
 ('-526','Não foi possível gravar um valor de conversão para esta moeda.'),
 ('-527','Não foi possível associar esta moeda como segunda moeda do documento.'),
-('-528','Não foi possível gravar o documento com os dados de segunda moeda.');
+('-528','Não foi possível gravar o documento com os dados de segunda moeda.'),
+('-969','Existem avisos a verificar');

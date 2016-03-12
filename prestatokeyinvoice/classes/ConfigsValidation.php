@@ -30,6 +30,7 @@ class ConfigsValidation extends Module
             
             $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
             $client = new SoapClient($url);
+            
             return $client;
             
         } catch (Exception $e) {
@@ -39,7 +40,7 @@ class ConfigsValidation extends Module
         
     }
     
-    public static function APIWSSession($client,$from) {
+    public static function APIWSSession($client, $from) {
         
         if ($from == 'getContent') {
             
