@@ -147,7 +147,7 @@ class OrderToKeyInvoice extends Module
                     // sync shipping
                     // retira o produto criado como transporta no lado do key
                     $shipping = $order->getShipping();
-					if ($shipping) {
+					if ($shipping[0]['shipping_cost_tax_excl'] != "0.000000") {
 						
 				        $result = OrderToKeyInvoice::sendShippingCost($session, $client, $shipping, $getDocTypeShip, $docID);
                         if (isset($result) && $result[0] != '1')
