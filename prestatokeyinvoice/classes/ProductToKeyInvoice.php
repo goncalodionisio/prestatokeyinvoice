@@ -44,11 +44,11 @@ class ProductToKeyInvoice extends Module
     public static function saveByProductObject($product)
     {
         $ref = isset($product->reference) ? $product->reference : 'N/A';
-        $designation = isset($product->name) ?  utf8_encode(reset($product->name)) : 'N/A';
+        $designation = isset($product->name) ? utf8_encode($product->name) : 'N/A';
+
         $shortName = 'N/A';
 
         $taxValue = $product->getIdTaxRulesGroup();
-        # $tax      = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByID($taxValue) : ''; # old no tax rule group validation
         $tax      = isset($taxValue) ? (string)PrestaToKeyInvoiceGetValueByID::getTaxByRulesGroup($taxValue) : '';
 
         if ($tax == "") # if empty set 0 tax
@@ -58,8 +58,8 @@ class ProductToKeyInvoice extends Module
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
         $hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
         $active     = isset($product->active) ? $product->active : '1';
-        $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(reset($product->description_short))) : 'N/A';
-        $longDesc   = isset($product->description) ? utf8_encode(strip_tags(reset($product->description))) : 'N/A';
+        $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags($product->description_short)) : 'N/A';
+        $longDesc   = isset($product->description) ? utf8_encode(strip_tags($product->description)) : 'N/A';
         $price      = isset($product->price) ? $product->price : '';
         $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
         $ean        = isset($product->ean13) ? $product->ean13 : '';

@@ -26,7 +26,7 @@ class PrestaToKeyInvoice extends Module
         $this->name = 'prestatokeyinvoice';
         $this->tab = 'billing_invoicing';
         $this->version = '1.0.0';
-        $this->author = 'Majoinfa, lda';
+        $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
         parent::__construct();
         $this->displayName = $this->l('Presta To KeyInvoice');
@@ -239,14 +239,16 @@ class PrestaToKeyInvoice extends Module
             return false;
         }
 
-        $id_product = (int)Tools::getValue('id_product');
+        if ($id_product = (int)Tools::getValue('id_product')) {
+            $product = new Product($id_product, false, $this->context->language->id, $this->context->shop->id, $this->context);
 
-        $result = ProductToKeyInvoice::saveByIdProduct($id_product);
+            $result = ProductToKeyInvoice::saveByProductObject($product);
 
-        if (isset($result) && $result[0] != '1')
-        {
-            $result[0] = utf8_encode($this->getWSResponse($result[0]));
-            $this->sendWSErrorResponse($result);
+            if (isset($result) && $result[0] != '1')
+            {
+                $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                $this->sendWSErrorResponse($result);
+            }
         }
 
         return true;
@@ -341,6 +343,20 @@ class PrestaToKeyInvoice extends Module
         if (!$session = ConfigsValidation::APIWSSession($client, 'ClientToKeyInvoice'))
             return false;
 
+        if (Tools::isSubmit('keyinvoice_save_address'))
+        {
+            $result = ClientToKeyInvoice::saveByIdAddress(Tools::getValue('keyinvoice_address_radio'));
+
+            if (isset($result)) {
+                if ($result[0] != '1') {
+                    $result[0] = utf8_encode($this->getWSResponse($result[0]));
+                    $this->sendWSErrorResponse($result);
+                }  else {
+                    $this->context->smarty->assign('send_to_key_invoice_confirmation', "ok");
+                }
+            }
+        }
+
         if (Validate::isLoadedObject($customer = new Customer((int)Tools::getValue('id_customer'))))
         {
             $address_list = $customer->getAddresses($this->context->language->id);
@@ -351,19 +367,15 @@ class PrestaToKeyInvoice extends Module
 
                 $clientAddress = $client->getClient("$session", "$vat_number");
 
-                if ($clientAddress->DAT[0]->Address == ($addr['address1'] . ", " . $addr['address2']))
-                {
-                    $selected_address = $addr['id_address'];
+                if (isset($clientAddress) && isset($clientAddress->DAT) && count($clientAddress->DAT) > 0) {
+                    if ($clientAddress->DAT[0]->Address == ($addr['address1'] . ", " . $addr['address2'])) {
+                        $selected_address = $addr['id_address'];
+                    }
                 }
             }
 
             $this->context->smarty->assign('selected_address', $selected_address);
             $this->context->smarty->assign('address_list', $address_list);
-        }
-
-        if (Tools::isSubmit('keyinvoice_save_address'))
-        {
-            ClientToKeyInvoice::saveByIdAddress(Tools::getValue('keyinvoice_address_radio'));
         }
 
         return $this->display(__FILE__, 'displayAdminCustomers.tpl');

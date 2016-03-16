@@ -13,6 +13,11 @@
  *  @license   LICENSE.txt
  */
 *}
+
+{if isset($send_to_key_invoice_confirmation)}
+	<div class="alert alert-success">{l s='Address Saved' mod='prestatokeyinvoice'}</div>
+{/if}
+
 <div class="col-lg-6">
 	<div class="panel">
 		<div class="panel-heading">
@@ -40,7 +45,7 @@
 
 			<button type="submit" name="keyinvoice_save_address" class="button btn btn-default button-medium">
 				<span>
-					{l s='Set' mod='prestatokeyinvoice'}
+					{l s='Send to KeyInvoice' mod='prestatokeyinvoice'}
 					<i class="icon-chevron-right right"></i>
 				</span>
 			</button>

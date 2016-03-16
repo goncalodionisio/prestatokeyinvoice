@@ -77,7 +77,7 @@
 	        <div class="col-lg-6">
 	        	<fieldset>
 	            <legend>&nbsp;</legend>
-	        		<p class="text-justify">- {l s='Help text about Products' mod='prestatokeyinvoice'}</p>
+	        		<p class="text-justify">- {l s='Enable product integration and everytime you save your product it will be created in KeyInvoice.' mod='prestatokeyinvoice'}</p>
 	        	</fieldset>
 	        </div>
         </div>
@@ -100,7 +100,7 @@
 	        <div class="col-lg-6">
 	        	<fieldset>
 	            <legend>&nbsp;</legend>
-	        		<p class="text-justify">- {l s='Help text about Customers' mod='prestatokeyinvoice'}</p>
+	        		<p class="text-justify">- {l s='Enable customer integration and everytime you save customer information in fron-office or back-office your customer information will be created / updated in KeyInvoice.' mod='prestatokeyinvoice'}</p>
 	        	</fieldset>
 	        </div>
         </div>
@@ -142,7 +142,7 @@
 	        <div class="col-lg-6">
 	        	<fieldset>
 	            <legend>&nbsp;</legend>
-	        		<p class="text-justify">- {l s='Help text about Orders' mod='prestatokeyinvoice'}</p>
+	        		<p class="text-justify">- {l s='Enable order integration and everytime you create a order in back-office or your customer creates a order in front-office the billing document will be created in KeyInvoice.' mod='prestatokeyinvoice'}</p>
 	        	</fieldset>
 	        </div>
         </div>
