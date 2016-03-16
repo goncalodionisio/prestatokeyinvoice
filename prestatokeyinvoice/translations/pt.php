@@ -1,22 +1,36 @@
 <?php
-/**
- * NOTICE OF LICENSE
- *
- * This file is licenced under the Software License Agreement.
- * With the purchase or the installation of the software in your application
- * you accept the licence agreement.
- *
- * You must not modify, adapt or create derivative works of this source code
- *
- *  @author    Majoinfa - Sociedade Unipessoal Lda
- *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
- *  @license   LICENSE.txt
- */
- 
+
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_ad3ce1128ea03ccbe064bb569bd98738'] = 'Activar sincronização de produtos';
+$_MODULE['<{prestatokeyinvoice}prestashop>prestatokeyinvoice_8f838cf5ef326c8e43f420b60d1d8ee3'] = 'Presta To KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>prestatokeyinvoice_57596ac48822ba9683945355b97a37cd'] = 'Integração com o sistema de faturação KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadmincustomers_6acdf7ae74e475d916ad54905ebd5350'] = 'Actualização Clientes no KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadmincustomers_5d5b78699e57104f2fa03bbdf7b9197b'] = 'Criar / Atualizar cliente no KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminorder_8f838cf5ef326c8e43f420b60d1d8ee3'] = 'Presta To KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminorder_010e98cdd304115ecc0b091c64b15e8a'] = 'Tipo de Documento';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminorder_4dfe154e07c40587b061e5658c5e8fec'] = 'Tipo de Documento de Faturação';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminorder_745e294adc3675c5ccd5bb9452b39dc6'] = 'Criar Documento Faturação';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminorder_ae08a037d2c439885e962d476a17b358'] = 'Encomenda Criada no KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminproductsextra_a3ed1ac957c5b3334cecd87c0aaafd63'] = 'Não foi possível contactar o KeyInvoice, tente mais tarde. ';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminproductsextra_016e3960e1c210d1522c879806742d0d'] = 'Integração de produtos no KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>displayadminproductsextra_56998f876ce39162431cd04746378c41'] = 'Criar / Atualizar produto no KeyInvoice';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_c888438d14855d7d96a2724ee9c306bd'] = 'Configurações gravadas.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_207858d0c716e543a8e3c2fa08fc6e4f'] = 'Chave não reconhecida.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_365ecbbd8fe215d85af318e73072d1a8'] = 'A API Key não foi definida.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_a3ed1ac957c5b3334cecd87c0aaafd63'] = 'Não foi possível contactar o KeyInvoice. Tente mais tarde.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_254f642527b45bc260048e30704edb39'] = 'Configuração';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_6a26f548831e6a8c26bfbbd9f6ec61e0'] = 'Ajuda';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_ba2eae1710fff28f04902de67ac4e06b'] = 'Guardar aqui a API Key gerada no KeyInvoice.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_068f80c7519d0528fb08e82137a72131'] = 'Produtos';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_d227265af2e599f3172d00bb038faa94'] = 'Ativar / Desativar sincronização.';
 $_MODULE['<{prestatokeyinvoice}prestashop>getcontent_93cba07454f06a4a960172bbd6e2a435'] = 'Sim';
 $_MODULE['<{prestatokeyinvoice}prestashop>getcontent_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Não';
-$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_659f8872b14c8149a8945f094d602c7f'] = 'Activar sincronização de clientes';
-$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_6d3fb1485749f430d0c17c2f86d06915'] = 'Activar sincronização de encomendas';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_227c868b050cd983787591a75375f1d7'] = 'Enable product integration and everytime you save your product it will be created in KeyInvoice.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_e6d0e1c8fc6a4fcf47869df87e04cd88'] = 'Clientes';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_6d13f99136c8a5901cbe9e8c87cab56d'] = 'Enable customer integration and everytime you save customer information in fron-office or back-office your customer information will be created / updated in KeyInvoice.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Encomendas';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_1ec79ed355bce1451a3336191c7fe6c2'] = 'Documento Base';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_67ec47e95a7c6e05eff2e12927793982'] = 'Enable order integration and everytime you create a order in back-office or your customer creates a order in front-office the billing document will be created in KeyInvoice.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_0db377921f4ce762c62526131097968f'] = 'Configurações Gerais';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_399849c3ebefed13a9f883588a03d607'] = 'Para cobrar as despesas de envio deve criar um produto / serviço no Keyinvoice e guardar aqui a sua referência. Esse produto / serviço será usado para cobrar os custos de envio.';
+$_MODULE['<{prestatokeyinvoice}prestashop>getcontent_c9cc8cce247e49bae79f15173ce97354'] = 'Guardar';
