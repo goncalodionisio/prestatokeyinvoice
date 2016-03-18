@@ -19,14 +19,14 @@
 <div class="form-group clearfix">
 	<form action="" method="post" id="send-order-keyinvoice" >
 	<div class="col-lg-12">
-		<label for="" class="col-lg-4">{l s='docType' mod='prestatokeyinvoice'}:</label>
+		<label for="" class="col-lg-4">{l s='Document Type' mod='prestatokeyinvoice'}:</label>
 		<div class="col-lg-8">
 		    {html_options name=PRESTATOKEYINVOICE_SHIP_DOC_TYPE options=$ShipdocOptions selected=$ShipdefaultSelect}
 		</div>
 	</div>
 	{*
     <div class="col-lg-12">
-		<label for="" class="col-lg-4">{l s='Invoice docType' mod='prestatokeyinvoice'}:</label>
+		<label for="" class="col-lg-4">{l s='Document Type' mod='prestatokeyinvoice'}:</label>
         <div class="col-lg-8">
 	        {html_options name=PRESTATOKEYINVOICE_INV_DOC_TYPE options=$InvdocOptions selected=$InvdefaultSelect}
 		</div> 
@@ -34,7 +34,7 @@
 	*}
 	 <div class="col-lg-12">  
 		<div class="submit">
-			<button type="submit" name="process_sync_order" class="button btn btn-default button-medium"><span>{l s='Send Order' mod='prestatokeyinvoice'} <i class="icon-chevron-right right"></i></span></button>
+			<button type="submit" name="process_sync_order" class="button btn btn-default button-medium"><span>{l s='Send to KeyInvoice' mod='prestatokeyinvoice'} <i class="icon-chevron-right right"></i></span></button>
 		</div>
 	</div>
 	</form>
