@@ -368,7 +368,7 @@ class PrestaToKeyInvoice extends Module
                     $vat_number = $addr['vat_number'];
                     $clientAddress = $client->getClient("$session", "$vat_number");
 
-                    if (isset($clientAddress) && isset($clientAddress->DAT) && count($clientAddress->DAT) > 0)
+                    if (isset($clientAddress) && isset($clientAddress->DAT) && isset($clientAddress->DAT[0]->Address))
                     {
                         $addr1 = utf8_encode($addr['address1']);
                         $addr2 = utf8_encode($addr['address2']);
