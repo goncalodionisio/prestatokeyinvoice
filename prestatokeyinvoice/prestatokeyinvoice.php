@@ -240,7 +240,9 @@ class PrestaToKeyInvoice extends Module
         }
 
         if ($id_product = (int)Tools::getValue('id_product')) {
-            $product = new Product($id_product, false, $this->context->language->id, $this->context->shop->id, $this->context);
+            $default_language = Configuration::get('PS_LANG_DEFAULT');
+
+            $product = new Product($id_product, false, $default_language, $this->context->shop->id, null);
 
             $result = ProductToKeyInvoice::saveByProductObject($product);
 
@@ -337,6 +339,7 @@ class PrestaToKeyInvoice extends Module
 
     public function hookDisplayAdminCustomers()
     {
+
         if (!$client = ConfigsValidation::APIWSClient())
             return false;
 
@@ -362,16 +365,24 @@ class PrestaToKeyInvoice extends Module
             $address_list = $customer->getAddresses($this->context->language->id);
             $selected_address = "-1";
 
-            foreach($address_list as $addr) {
-                $vat_number = $addr['vat_number'];
+            foreach($address_list as $addr)
+            {
+                try
+                {
+                    $vat_number = $addr['vat_number'];
+                    $clientAddress = $client->getClient("$session", "$vat_number");
 
-                $clientAddress = $client->getClient("$session", "$vat_number");
+                    if (isset($clientAddress) && isset($clientAddress->DAT) && count($clientAddress->DAT) > 0)
+                    {
+                        $addr1 = utf8_encode($addr['address1']);
+                        $addr2 = utf8_encode($addr['address2']);
 
-                if (isset($clientAddress) && isset($clientAddress->DAT) && count($clientAddress->DAT) > 0) {
-                    if ($clientAddress->DAT[0]->Address == ($addr['address1'] . ", " . $addr['address2'])) {
-                        $selected_address = $addr['id_address'];
+                        if ($clientAddress->DAT[0]->Address == ($addr1 . ", " . $addr2))
+                        {
+                            $selected_address = $addr['id_address'];
+                        }
                     }
-                }
+                } catch (Exception $e) {}
             }
 
             $this->context->smarty->assign('selected_address', $selected_address);

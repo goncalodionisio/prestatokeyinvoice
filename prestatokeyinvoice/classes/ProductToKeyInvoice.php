@@ -44,7 +44,7 @@ class ProductToKeyInvoice extends Module
     public static function saveByProductObject($product)
     {
         $ref = isset($product->reference) ? $product->reference : 'N/A';
-        $designation = isset($product->name) ? utf8_encode($product->name) : 'N/A';
+        $designation = isset($product->name) ? utf8_encode(ProductToKeyInvoice::stringOrArray($product->name)) : 'N/A';
 
         $shortName = 'N/A';
 
@@ -58,8 +58,8 @@ class ProductToKeyInvoice extends Module
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
         $hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
         $active     = isset($product->active) ? $product->active : '1';
-        $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags($product->description_short)) : 'N/A';
-        $longDesc   = isset($product->description) ? utf8_encode(strip_tags($product->description)) : 'N/A';
+        $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description_short))) : 'N/A';
+        $longDesc   = isset($product->description) ? utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description))) : 'N/A';
         $price      = isset($product->price) ? $product->price : '';
         $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
         $ean        = isset($product->ean13) ? $product->ean13 : '';
@@ -74,6 +74,14 @@ class ProductToKeyInvoice extends Module
         }
 
         return null;
+    }
+
+    public static function stringOrArray($data)
+    {
+        if (is_array($data))
+            return reset($data);
+
+        return $data;
     }
 
 }
