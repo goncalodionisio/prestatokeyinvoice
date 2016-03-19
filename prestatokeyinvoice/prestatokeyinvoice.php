@@ -240,11 +240,7 @@ class PrestaToKeyInvoice extends Module
         }
 
         if ($id_product = (int)Tools::getValue('id_product')) {
-            $default_language = Configuration::get('PS_LANG_DEFAULT');
-
-            $product = new Product($id_product, false, $default_language, $this->context->shop->id, null);
-
-            $result = ProductToKeyInvoice::saveByProductObject($product);
+            $result = ProductToKeyInvoice::saveByIdProduct($id_product);
 
             if (isset($result) && $result[0] != '1')
             {

@@ -69,8 +69,11 @@ class ProductToKeyInvoice extends Module
 
     public static function saveByIdProduct($idProduct)
     {
-        if (Validate::isLoadedObject($product = new Product($idProduct))) {
-            return ProductToKeyInvoice::saveByProductObject($product);
+		$default_language = Configuration::get('PS_LANG_DEFAULT');
+		$default_shop_id = Configuration::get('PS_SHOP_DEFAULT');
+
+        if (Validate::isLoadedObject($product = new Product($idProduct, false, $default_language, $default_shop_id, null))) {
+			return ProductToKeyInvoice::saveByProductObject($product);
         }
 
         return null;
