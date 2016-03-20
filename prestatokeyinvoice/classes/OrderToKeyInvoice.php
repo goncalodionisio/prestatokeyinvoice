@@ -42,8 +42,6 @@ class OrderToKeyInvoice extends Module
     {
 
         $shipping_reference = Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
-		if (empty($shipping_reference))
-            return array(-969, "Aten&ccedil;&atilde;o transportadora n&atilde;o se encontra configurada no PrestaToKeyInvoice!");
 						
         if ($result = $client->getProduct("$session", "$shipping_reference"))
         {
@@ -62,6 +60,7 @@ class OrderToKeyInvoice extends Module
             $Price     = isset($shipping[0]['shipping_cost_tax_excl']) ? $shipping[0]['shipping_cost_tax_excl'] : '0.000000';
             $EAN     = isset($result->{"DAT"}[0]->EAN) ? $result->{"DAT"}[0]->EAN : '';
         }
+
         // trasportadoras - este produto n existe no presta so no keyinvoice nao se pode usar o metodo por ID
         $result = ProductToKeyInvoice::upsertProduct("$Ref", "$Name", "$ShortName", "$TAX", "$Obs", "$IsService", "$HasStocks", "$Active", "$ShortDescription", "$LongDescription", "$Price", "$VendorRef", "$EAN");
         if (isset($result) && $result[0] != '1')
@@ -94,13 +93,25 @@ class OrderToKeyInvoice extends Module
 
             if ($from == 'hookDisplayAdminOrder') 
             {
-                
+
                 $getDocTypeShip = Tools::getValue('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
-                
+
             } else {
   
                 $getDocTypeShip = Configuration::get('PRESTATOKEYINVOICE_SHIP_DOC_TYPE');
             }
+
+            // se nao estiver configurada transportadora no presta
+            $shipping_reference = Configuration::get('PRESTATOKEYINVOICE_SHIPPINGCOST');
+		    if (empty($shipping_reference))
+                return array(-969, "Aten&ccedil;&atilde;o transportadora n&atilde;o se encontra configurada no PrestaToKeyInvoice! Encomenda n&atilde;o sincronizada!");
+
+            // se transportadora do presta nao for igual no keyinvoice
+			$result = $client->getProduct("$session", "$shipping_reference");
+			$saved_reference = isset($result->{'DAT'}[0]->Ref) ? $result->{'DAT'}[0]->Ref : 'N/A';
+
+			if ("$saved_reference" == "N/A")
+			    return array(-969, "Aten&ccedil;&atilde;o transportadora \"$shipping_reference\" n&atilde;o se encontra configurada no KeyInvoice! Encomenda n&atilde;o sincronizada!");
 
             //$getDocTypeInv  = Tools::getValue('PRESTATOKEYINVOICE_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
@@ -115,9 +126,10 @@ class OrderToKeyInvoice extends Module
 
             $vat_number = isset($address_invoice->vat_number) ? $address_invoice->vat_number : '' ;
             $order_reference = isset($order->reference) ? $order->reference : 'N/A' ;
-            
+
             // create document
             $result = $client->insertDocumentHeader("$session", "$vat_number", "$getDocTypeShip", "","","", "", "", "", "$order_reference"); 
+
             $docID = $result[1];
             if (isset($result) && $result[0] != '1')
             {
@@ -156,9 +168,10 @@ class OrderToKeyInvoice extends Module
                 // sync shipping
                 // retira o produto criado como transporta no lado do key
                 $shipping = $order->getShipping();
+
 				if ($shipping[0]['shipping_cost_tax_excl'] != "0.000000")
 				{
-					
+
 			        $result = OrderToKeyInvoice::sendShippingCost($session, $client, $shipping, $getDocTypeShip, $docID);
                     if (isset($result) && $result[0] != '1')
                     {
