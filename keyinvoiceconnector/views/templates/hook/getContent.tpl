@@ -151,7 +151,7 @@
                 <fieldset>
                 <legend>{l s='General' mod='keyinvoiceconnector'}:</legend>
                     <div class="form-group clearfix">
-                        <label>Shipping Reference:</label>
+                        <label>{l s='Shipping Reference' mod='keyinvoiceconnector'}:</label>
                         <input type="text" placeholder="Shipping Cost Mapper" id="KEYINVOICECONNECTOR_SHIPPINGCOST" name="KEYINVOICECONNECTOR_SHIPPINGCOST" value="{$KEYINVOICECONNECTOR_SHIPPINGCOST|escape:'htmlall':'UTF-8'}" />
                     </div>
                 </fielset>
