@@ -19,7 +19,7 @@
  *
 */
 
-class ConfigsValidation extends Module
+class PHCXConfigsValidation extends Module
 {
 
     /******************************************************
@@ -68,10 +68,20 @@ class ConfigsValidation extends Module
     /******************************************************
      * Validations
      ******************************************************/
-    public static function appIDExists()
+    // change this stuff
+    public static function PHCXIdExists()
     {
-        $appID = (string)Configuration::get('appID');
-        return !(trim($appID) == "");
+        $appID = (string)Configuration::get('PHCXCONNECTOR_APPID');
+        $configUrl = (string)Configuration::get('PHCXCONNECTOR_CONFIG_URL');
+        $username = (string)Configuration::get('PHCXCONNECTOR_USERNAME');
+        $password = (string)Configuration::get('PHCXCONNECTOR_PASSWORD');
+        $company = (string)Configuration::get('PHCXCONNECTOR_COMPANY');
+
+        return !(trim($appID) == "" ||
+            trim($configUrl) == "" ||
+            trim($username) == "" ||
+            trim($password) == "" ||
+            trim($company) == "");
     }
     
     public static function shippingCostProductExists()
@@ -105,10 +115,12 @@ class ConfigsValidation extends Module
     
     public static function deleteByName()
     {
-        Configuration::deleteByName('config_url');
-        Configuration::deleteByName('password');
-        Configuration::deleteByName('username');
-        Configuration::deleteByName('appID');
+        Configuration::deleteByName('PHCXCONNECTOR_CONFIG_URL');
+        Configuration::deleteByName('PHCXCONNECTOR_PASSWORD');
+        Configuration::deleteByName('PHCXCONNECTOR_USERNAME');
+        Configuration::deleteByName('PHCXCONNECTOR_APPID');
+        Configuration::deleteByName('PHCXCONNECTOR_COMPANY');
+
         Configuration::deleteByName('PHCXCONNECTOR_PRODUCTS_SYNC');
         Configuration::deleteByName('PHCXCONNECTOR_CLIENTS_SYNC');
         Configuration::deleteByName('PHCXCONNECTOR_ORDERS_SYNC');
@@ -144,25 +156,30 @@ class ConfigsValidation extends Module
     /******************************************************
      * Set Sync Functions
      ******************************************************/
-     
+
     public static function setkiapi($value)
     {
-        Configuration::updateValue('appID', $value);
+        Configuration::updateValue('PHCXCONNECTOR_APPID', $value);
     }
 
     public static function setconfig_url($value)
     {
-        Configuration::updateValue('config_url', $value);
+        Configuration::updateValue('PHCXCONNECTOR_CONFIG_URL', $value);
     }
 
     public static function setusername($value)
     {
-        Configuration::updateValue('username', $value);
+        Configuration::updateValue('PHCXCONNECTOR_USERNAME', $value);
     }
 
     public static function setpassword($value)
     {
-        Configuration::updateValue('password', $value);
+        Configuration::updateValue('PHCXCONNECTOR_PASSWORD', $value);
+    }
+
+    public static function setcompany($value)
+    {
+        Configuration::updateValue('PHCXCONNECTOR_COMPANY', $value);
     }
 
     public static function setSyncProducts($value)

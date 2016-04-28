@@ -13,7 +13,7 @@
  *  @license   LICENSE.txt
 */
 
-class OrderToKeyInvoice extends Module
+class OrderToPHCX extends Module
 {
     public static function sendShippingAddr(
         $session,

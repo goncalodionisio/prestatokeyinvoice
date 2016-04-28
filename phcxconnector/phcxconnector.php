@@ -14,11 +14,13 @@
 */
 
 
-require 'classes/ConfigsValidation.php';
+require 'classes/PHCXConfigsValidation.php';
 require 'classes/GetValueByID.php';
 require 'classes/ClientToPHCX.php'; // client operations
 require 'classes/ProductToPHCX.php'; // product operations
 require 'classes/OrderToPHCX.php'; // product operations
+
+require 'classes/PHCXOperations.php';
 
 class PHCxConnector extends Module
 {
@@ -71,7 +73,7 @@ class PHCxConnector extends Module
             return false;
         }
         // Delete configuration values
-        ConfigsValidation::deleteByName();
+        PHCXConfigsValidation::deleteByName();
         return true;
     }
 
@@ -136,46 +138,64 @@ class PHCxConnector extends Module
     {
         if (Tools::isSubmit('ptinvc_save_form')) {
             // enable/disable products syncronization with PHCX
-            ConfigsValidation::setSyncProducts(Tools::getValue('enable_products_sync'));
+            PHCXConfigsValidation::setSyncProducts(Tools::getValue('enable_products_sync'));
             // enable/disable clients syncronization with PHCX
-            ConfigsValidation::setSyncClients(Tools::getValue('enable_clients_sync'));
+            PHCXConfigsValidation::setSyncClients(Tools::getValue('enable_clients_sync'));
             // enable/disable orders syncronization with PHCX
-            ConfigsValidation::setSyncOrders(Tools::getValue('enable_orders_sync'));
+            PHCXConfigsValidation::setSyncOrders(Tools::getValue('enable_orders_sync'));
             // choose doctype to sync by default
-            ConfigsValidation::setDocTypeShip(Tools::getValue('PHCXCONNECTOR_SHIP_DOC_TYPE'));
-            ConfigsValidation::setDocTypeInv(Tools::getValue('PHCXCONNECTOR_INV_DOC_TYPE'));
+            PHCXConfigsValidation::setDocTypeShip(Tools::getValue('PHCXCONNECTOR_SHIP_DOC_TYPE'));
+            PHCXConfigsValidation::setDocTypeInv(Tools::getValue('PHCXCONNECTOR_INV_DOC_TYPE'));
             // configure doc reference for shipping cost
-            ConfigsValidation::setShippingCostProduct(Tools::getValue('PHCXCONNECTOR_SHIPPINGCOST'));
+            PHCXConfigsValidation::setShippingCostProduct(Tools::getValue('PHCXCONNECTOR_SHIPPINGCOST'));
             
             // check key
             if (!$appID = Tools::getValue('appID')) {
                 
                 $this->context->smarty->assign('appID', 'na');
-                ConfigsValidation::deleteByName();
+                PHCXConfigsValidation::deleteByName();
                 return false;
             }
             
-            ConfigsValidation::setkiapi(Tools::getValue('appID'));
+            PHCXConfigsValidation::setkiapi(Tools::getValue('appID'));
             $this->context->smarty->assign('confirmation_appID', 'ok');
-            ConfigsValidation::setusername(Tools::getValue('username'));
+
+            PHCXConfigsValidation::setusername(Tools::getValue('username'));
             $this->context->smarty->assign('confirmation_username', 'ok');
-             ConfigsValidation::setpassword(Tools::getValue('password'));
+
+             PHCXConfigsValidation::setpassword(Tools::getValue('password'));
             $this->context->smarty->assign('confirmation_password', 'ok');
-            ConfigsValidation::setconfig_url(Tools::getValue('config_url'));
-            $this->context->smarty->assign('confirmation_config_url', 'ok');         
+
+            PHCXConfigsValidation::setconfig_url(Tools::getValue('config_url'));
+            $this->context->smarty->assign('confirmation_config_url', 'ok');
+
+            PHCXConfigsValidation::setcompany(Tools::getValue('phcx_company'));
+            $this->context->smarty->assign('confirmation_phcx_company', 'ok');
+
+            // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
+            //$result = PHCXOperations::Login();
+            //var_dump($result);
+            //die();
         }
     }
 
     public function assignConfiguration()
     {
-        $config_url = Configuration::get('config_url');
+        $config_url = Configuration::get('PHCXCONNECTOR_CONFIG_URL');
         $this->context->smarty->assign('config_url', $config_url);
-        $username = Configuration::get('username');
+
+        $username = Configuration::get('PHCXCONNECTOR_USERNAME');
         $this->context->smarty->assign('username', $username);
-        $password = Configuration::get('password');
+
+        $password = Configuration::get('PHCXCONNECTOR_PASSWORD');
         $this->context->smarty->assign('password', $password);
-        $appID = Configuration::get('appID');
+
+        $appID = Configuration::get('PHCXCONNECTOR_APPID');
         $this->context->smarty->assign('appID', $appID);
+
+        $phcx_company = Configuration::get('PHCXCONNECTOR_COMPANY');
+        $this->context->smarty->assign('phcx_company', $phcx_company);
+
         // enable/disable products syncronization with PHCX
         $enable_products_sync = Configuration::get('PHCXCONNECTOR_PRODUCTS_SYNC');
         $this->context->smarty->assign('enable_products_sync', $enable_products_sync);
@@ -235,12 +255,12 @@ class PHCxConnector extends Module
     public function hookActionProductSave()
     {
         // sai se não for para sincronizar com a api dos produtos
-        if (!ConfigsValidation::syncProducts()) {
+        if (!PHCXConfigsValidation::syncProducts()) {
             return false;
         }
 
         // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!ConfigsValidation::appIDExists()) {
+        if (!PHCXConfigsValidation::PHCXIdExists()) {
             $this->context->controller->errors[] = 'appID not defined';
             return false;
         }
@@ -260,12 +280,12 @@ class PHCxConnector extends Module
     public function addAndUpdateClients($params)
     {
         // sai se não for para sincronizar com a api dos produtos
-        if (!ConfigsValidation::syncClients()) {
+        if (!PHCXConfigsValidation::syncClients()) {
             return false;
         }
 
         // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!ConfigsValidation::appIDExists()) {
+        if (!PHCXConfigsValidation::PHCXIdExists()) {
             $this->context->controller->errors[] = 'appID not defined';
             return false;
         }
@@ -300,12 +320,12 @@ class PHCxConnector extends Module
     public function hookDisplayAdminOrder()
     {
         // sai se não for para sincronizar com a api das encomendas
-        if (!ConfigsValidation::syncOrders()) {
+        if (!PHCXConfigsValidation::syncOrders()) {
             return false;
         }
         
         // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!ConfigsValidation::appIDExists()) {
+        if (!PHCXConfigsValidation::PHCXIdExists()) {
             $this->context->controller->errors[] = 'appID not defined';
             return false;
         }
@@ -334,10 +354,10 @@ class PHCxConnector extends Module
     public function hookDisplayAdminCustomers()
     {
 
-        if (!$client = ConfigsValidation::APIWSClient()) {
+        if (!$client = PHCXConfigsValidation::APIWSClient()) {
             return false;
         }
-        if (!$session = ConfigsValidation::APIWSSession($client, 'ClientToPHCX')) {
+        if (!$session = PHCXConfigsValidation::APIWSSession($client, 'ClientToPHCX')) {
             return false;
         }
         if (Tools::isSubmit('PHCX_save_address')) {
@@ -388,12 +408,12 @@ class PHCxConnector extends Module
     public function hookOrderConfirmation()
     {
         // sai se não for para sincronizar com a api das encomendas
-        if (!ConfigsValidation::syncOrders()) {
+        if (!PHCXConfigsValidation::syncOrders()) {
             return false;
         }
         
         // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!ConfigsValidation::appIDExists()) {
+        if (!PHCXConfigsValidation::PHCXIdExists()) {
             return false;
         }
 

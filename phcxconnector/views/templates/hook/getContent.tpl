@@ -74,8 +74,8 @@
                         </div>
                         <div class="col-lg-10">
                             <input type="text" placeholder="appID" id="appID" name="appID" value="{$appID|escape:'htmlall':'UTF-8'}" />
-                         </div>
-                         <div class="col-lg-2">   
+                        </div>
+                        <div class="col-lg-2">
                             {if empty($appID) and empty($no_appID) }
                                 <img src="../img/admin/status_orange.png" alt="" />
                             {elseif isset($no_appID)}
@@ -84,8 +84,20 @@
                                 <img src="../img/admin/status_green.png" alt="" />
                             {/if}
                         </div>
+                        <div class="col-lg-10">
+                            <input type="text" placeholder="company" id="phcx_company" name="phcx_company" value="{$phcx_company|escape:'htmlall':'UTF-8'}" />
+                        </div>
+                        <div class="col-lg-2">
+                            {if empty($phcx_company) and empty($no_phcx_company) }
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif isset($no_phcx_company)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
+                        </div>
                     </div>
-                </fielset>
+                </fieldset>
             </div>        
             <div class="col-lg-6">
                 <fieldset>
@@ -108,7 +120,7 @@
                             <input type="radio" id="'enable_products_sync_0" name="enable_products_sync" value="0" {if empty($enable_products_sync) || $enable_products_sync eq 0}checked{/if}>
                             <label for="'enable_products_sync_0" class="t">{l s='No' mod='phcxconnector'}</label>
                     </div>
-                </fielset>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
@@ -131,7 +143,7 @@
                         <input type="radio" id="'enable_clients_sync_0" name="enable_clients_sync" value="0" {if empty($enable_clients_sync) || $enable_clients_sync eq 0}checked{/if}>
                         <label for="'enable_clients_sync_0" class="t">{l s='No' mod='phcxconnector'}</label>
                     </div>
-                </fielset>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
@@ -173,7 +185,7 @@
                          {/if}
                     </div>
                     *}
-                </fielset>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
@@ -190,7 +202,7 @@
                         <label>{l s='Shipping Reference' mod='phcxconnector'}:</label>
                         <input type="text" placeholder="Shipping Cost Mapper" id="PHCXCONNECTOR_SHIPPINGCOST" name="PHCXCONNECTOR_SHIPPINGCOST" value="{$PHCXCONNECTOR_SHIPPINGCOST|escape:'htmlall':'UTF-8'}" />
                     </div>
-                </fielset>
+                </fieldset>
             </div>        
             <div class="col-lg-6">
                 <fieldset>
