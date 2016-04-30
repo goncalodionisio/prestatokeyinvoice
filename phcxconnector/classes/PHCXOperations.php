@@ -16,15 +16,12 @@
 class PHCXOperations extends Module
 {
 
-    public static function Login()
+    public static function login()
     {
-        $config_url = Configuration::get('PHCXCONNECTOR_CONFIG_URL');
         $user_login = Configuration::get('PHCXCONNECTOR_USERNAME');
         $user_pass = Configuration::get('PHCXCONNECTOR_PASSWORD');
         $appID = Configuration::get('PHCXCONNECTOR_APPID');
         $company = Configuration::get('PHCXCONNECTOR_COMPANY');
-
-        $url = $config_url . "/REST/UserLoginWS/userLoginCompany";
 
         $params = array ('userCode' => $user_login,
             'password' => $user_pass,
@@ -32,20 +29,33 @@ class PHCXOperations extends Module
             'company' => $company
         );
 
+        return PHCXOperations::connect("/REST/UserLoginWS/userLoginCompany", $params);
+    }
+
+    // connect to PHC
+    private static function connect($url, $params)
+    {
+        $config_url = Configuration::get('PHCXCONNECTOR_CONFIG_URL');
+
+        $auxUrl = $config_url . $url;
+
         // Build Http query using params
         $query = http_build_query ($params);
 
         $ch = curl_init();
+        
         //URL to save cookie "ASP.NET_SessionId"
-        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_URL, $auxUrl);
         curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
         curl_setopt($ch, CURLOPT_POST, true);
+        
         //Parameters passed to POST
         curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_COOKIESESSION, true);
         curl_setopt($ch, CURLOPT_COOKIEJAR, '');
         curl_setopt($ch, CURLOPT_COOKIEFILE, '');
+        
         return json_decode(curl_exec($ch), true);
     }
 

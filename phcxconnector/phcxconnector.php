@@ -173,7 +173,7 @@ class PHCxConnector extends Module
             $this->context->smarty->assign('confirmation_phcx_company', 'ok');
 
             // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
-            //$result = PHCXOperations::Login();
+            //$result = PHCXOperations::login();
             //var_dump($result);
             //die();
         }
