@@ -15,8 +15,16 @@
 
 class PHCXOperations extends Module
 {
+    var $ch;
+    var $config_url;
 
-    public static function login()
+    public function PHCXOperations()
+    {
+        $this->ch = curl_init();
+        $this->config_url = Configuration::get('PHCXCONNECTOR_CONFIG_URL');
+    }
+
+    function login()
     {
         $user_login = Configuration::get('PHCXCONNECTOR_USERNAME');
         $user_pass = Configuration::get('PHCXCONNECTOR_PASSWORD');
@@ -29,34 +37,73 @@ class PHCXOperations extends Module
             'company' => $company
         );
 
-        return PHCXOperations::connect("/REST/UserLoginWS/userLoginCompany", $params);
+        curl_setopt($this->ch, CURLOPT_URL, $this->config_url . "/REST/UserLoginWS/userLoginCompany");
+        curl_setopt($this->ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
+        curl_setopt($this->ch, CURLOPT_POST, true);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, http_build_query ($params));
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_COOKIESESSION, true);
+        curl_setopt($this->ch, CURLOPT_COOKIEJAR, '');
+        curl_setopt($this->ch, CURLOPT_COOKIEFILE, '');
+
+        return json_decode(curl_exec($this->ch), true);
     }
 
-    // connect to PHC
-    private static function connect($url, $params)
+    function logout()
     {
-        $config_url = Configuration::get('PHCXCONNECTOR_CONFIG_URL');
+        curl_setopt($this->ch, CURLOPT_URL, $this->config_url . "/REST/UserLoginWS/userLogout");
+        curl_setopt($this->ch, CURLOPT_POST, false);
+        return json_decode(curl_exec($this->ch), true);
+    }
 
-        $auxUrl = $config_url . $url;
+    // builds structure for new object
+    function newInstance($objType)
+    {
+        $url = "/REST/{$objType}/getNewInstance";
+        $params = array ('ndos' => 0);
 
-        // Build Http query using params
-        $query = http_build_query ($params);
+        return $this->runOperation($url, $params);
+    }
 
-        $ch = curl_init();
-        
-        //URL to save cookie "ASP.NET_SessionId"
-        curl_setopt($ch, CURLOPT_URL, $auxUrl);
-        curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
-        curl_setopt($ch, CURLOPT_POST, true);
-        
-        //Parameters passed to POST
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_COOKIESESSION, true);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, '');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, '');
-        
-        return json_decode(curl_exec($ch), true);
+    function save($objType, $result)
+    {
+        $url = "/REST/{$objType}/Save";
+        $params = array ('itemVO' => json_encode($result), 'runWarningRules' => 'false');
+
+        return $this->runOperation($url, $params);
+    }
+
+    function query($objType, $fields)
+    {
+        $data = '{ "groupByItems":[],"lazyLoaded":false,"joinEntities":[],"orderByItems":[],"SelectItems":[],"entityName":"","filterItems":[';
+
+        foreach ($fields as $field) {
+            $data = $data . '{"comparison":0,"filterItem":"' . $field['column'] . '","valueItem":"' . $field['value'] . '","groupItem":9,"checkNull":false,"skipCheckType":false,"type":"Number"}';
+        }
+
+	    $data = $data . ']}';
+
+        $url = "/REST/{$objType}/Query";
+        $params = array ('itemQuery' => $data);
+
+        return $this->runOperation($url, $params);
+    }
+
+    function update($objType, $stamp, $field, $value)
+    {
+        $url = "/REST/{$objType}/updateEntity";
+        $params = array ('Stamp' => $stamp, 'field' => $field, 'newValue' => $value);
+        return $this->runOperation($url, $params);
+    }
+
+    // run POST
+    private function runOperation($url, $params)
+    {
+        curl_setopt($this->ch, CURLOPT_URL, $this->config_url . $url);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, http_build_query ($params));
+        curl_setopt($this->ch, CURLOPT_POST, true);
+
+        return json_decode(curl_exec($this->ch), true);
     }
 
 }
