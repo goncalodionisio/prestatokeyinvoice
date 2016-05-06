@@ -16,70 +16,63 @@
 class ProductToPHCX extends Module
 {
 
-    public static function upsertProduct(
-        $ref,
-        $designation,
-        $shortName,
-        $tax,
-        $obs,
-        $isService,
-        $hasStocks,
-        $active,
-        $shortDesc,
-        $longDesc,
-        $price,
-        $vendorRef,
-        $ean
-    ) {
+    public static function upsertProduct($ref, $designation, $shortName, $tax, $obs, $stock, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean) {
 
-        if (!$client = ConfigsValidation::APIWSClient()) {
-            return false;
-        }
-        if (!$session = ConfigsValidation::APIWSSession($client, 'ProductToPHCX')) {
-            return false;
-        }
+
         // check if exists to always upsert
-        $productExists=$client->productExists("$session", "$ref");
-        $result = $productExists[0];
+        $phcxOps = new PHCXOperations();
+        $response = $phcxOps->login();
 
-        if ($result == 1) {
+        if ($response[0] == "nok")
+            return $response;
 
-            $result = $client->updateProduct(
-                "$session",
-                "$ref",
-                "$designation",
-                "$shortName",
-                "$tax",
-                "$obs",
-                "$isService",
-                "$hasStocks",
-                "$active",
-                "$shortDesc",
-                "$longDesc",
-                "$price",
-                "$vendorRef",
-                "$ean"
-            );
+        // product exists ?
+        $response = $phcxOps->query("StWS", array(array('column' => 'ref', 'value' => $ref)));
 
+        if (count($response['result']) != 0) {
+
+            //$result = $client->updateProduct("$session", "$ref", "$designation", "$shortName", "$tax", "$obs", "$stock", "$active", "$shortDesc", "$longDesc", "$price", "$vendorRef", "$ean");
+            var_dump("helo");
+            die();
         } else {
+            //$result = $client->insertProduct("$session", "$ref", "$designation", "$shortName", "$tax", "$obs", "$isService", "$hasStocks", "$active", "$shortDesc", "$longDesc", "$price", "$vendorRef", "$ean");
 
-            $result = $client->insertProduct(
-                "$session",
-                "$ref",
-                "$designation",
-                "$shortName",
-                "$tax",
-                "$obs",
-                "$isService",
-                "$hasStocks",
-                "$active",
-                "$shortDesc",
-                "$longDesc",
-                "$price",
-                "$vendorRef",
-                "$ean"
-            );
+            // new product
+            $result = $phcxOps->newInstance("StWS");
+
+            $result['result'][0]['ref'] = $ref;
+            $result['result'][0]['design'] = $designation;
+            $result['result'][0]['desctec'] = $longDesc;
+            $result['result'][0]['tipodesc'] = $obs;
+            $result['result'][0]['codigo'] = $ean;
+
+            //$result['result'][0]['tabiva'] = $tax;
+            $result['result'][0]['epv1iva'] = $tax;
+            $result['result'][0]['epv1'] = $price;
+            $result['result'][0]['quantity'] = $stock;
+
+
+            $result = $phcxOps->save("StWS", $result['result'][0]);
+
+            var_dump($result);
+            die();
+
+/*
+ref 		=> reference
+stock 		=> quantity
+desctec 	=> description
+tabiva		=> $tax
+codigo		=> isset($product->ean13) ? $product->ean13 : '';
+
+[familia"]         => string(13) "Membranofones"
+["faminome"]         => string(62) "Instrumento cujo elemento vibratório é uma membrana retesada"
+
+tipodesc	=> "Produto inserido via PHCX Connector"
+desctec 	=> description
+*/
+
         }
+
         return $result;
     }
 
@@ -99,7 +92,8 @@ class ProductToPHCX extends Module
         }
         $obs        = "Produto inserido via PHCX Connector";
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
-        $hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
+        #$hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
+        $stock      = (int)$product->getQuantity($product->id);
         $active     = isset($product->active) ? $product->active : '1';
         $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(ProductToPHCX::stringOrArray($product->description_short))) : 'N/A';
         $longDesc   = isset($product->description) ? utf8_encode(strip_tags(ProductToPHCX::stringOrArray($product->description))) : 'N/A';
@@ -113,8 +107,7 @@ class ProductToPHCX extends Module
             $shortName,
             $tax,
             $obs,
-            $isService,
-            $hasStocks,
+            $stock,
             $active,
             $shortDesc,
             $longDesc,

@@ -46,7 +46,14 @@ class PHCXOperations extends Module
         curl_setopt($this->ch, CURLOPT_COOKIEJAR, '');
         curl_setopt($this->ch, CURLOPT_COOKIEFILE, '');
 
-        return json_decode(curl_exec($this->ch), true);
+        $response = json_decode(curl_exec($this->ch), true);
+
+        if (empty($response))
+            return array("nok", "Can't connect to webservice!! There's an empty response");
+        else if(isset($response['messages'][0]['messageCodeLocale']))
+            return array("nok", "Wrong Login! Please check your entered data!");
+
+        return array("ok", "");
     }
 
     function logout()

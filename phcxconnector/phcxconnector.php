@@ -173,29 +173,27 @@ class PHCxConnector extends Module
             $this->context->smarty->assign('confirmation_phcx_company', 'ok');
 
             // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
-            $phcxOps = new PHCXOperations();
-            $result = $phcxOps->login();
+            //$phcxOps = new PHCXOperations();
+            //$result = $phcxOps->login();
 
             // new product
-            // $result = $phcxOps->newInstance("StWS");
+            //$result = $phcxOps->newInstance("StWS");
+
             // $result['result'][0]['ref'] = "xuxinhas";
             // $result['result'][0]['design'] = "xuxinhas";
             // $result = $phcxOps->save("StWS", $result['result'][0]);
 
             // get product (duas formas de fazer o select)
             // $fields = array(array('column' => 'ref', 'value' => 'xuxinhas'), array('column' => 'design', 'value' => 'xuxinhas'));
-            // $fields = array(array('column' => 'ref', 'value' => 'xuxinhas'));
-            // $result = $phcxOps->query("StWS", $fields);
+            //$fields = array(array('column' => 'ref', 'value' => 'A001'));
+            //$result = $phcxOps->query("StWS", $fields);
+            //var_dump($result);
+            //die();
 
             // update
             // $result = $phcxOps->update("StWS", "0f4-453d-beec-5e603ac5a3a", "design", "\"xuxitas\"");
 
             // $result = $phcxOps->logout();
-
-            var_dump($result);
-            die();
-
-
         }
     }
 
