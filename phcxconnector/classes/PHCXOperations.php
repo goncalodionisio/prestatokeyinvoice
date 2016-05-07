@@ -113,4 +113,15 @@ class PHCXOperations extends Module
         return json_decode(curl_exec($this->ch), true);
     }
 
+    public static function ResponseStatus($response)
+    {
+        if (empty($response))
+            return array("nok", "Can't connect to webservice!! There's an empty response");
+        else if ($response == null)
+            return array("nok", "Unknown error");
+        else if(isset($response['messages'][0]))
+            return array("nok", $response['messages'][0]);
+        else
+            return array("ok", "");
+    }
 }

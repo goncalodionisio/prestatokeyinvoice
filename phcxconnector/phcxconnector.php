@@ -279,16 +279,15 @@ class PHCxConnector extends Module
 
         // Se a chave não existir coloca mensagem para o ecrã e sai
         if (!PHCXConfigsValidation::PHCXIdExists()) {
-            $this->context->controller->errors[] = 'appID not defined';
+            $this->context->controller->errors[] = 'PHCX autentication not defined';
             return false;
         }
 
         if ($id_product = (int)Tools::getValue('id_product')) {
             $result = ProductToPHCX::saveByIdProduct($id_product);
 
-            if (isset($result) && $result[0] != '1') {
-                $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                $this->sendWSErrorResponse($result);
+            if ($result[0] == "nok") {
+                $this->context->controller->errors[] =utf8_decode($result[1]);
             }
         }
 

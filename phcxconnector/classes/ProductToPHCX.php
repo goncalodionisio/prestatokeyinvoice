@@ -16,8 +16,7 @@
 class ProductToPHCX extends Module
 {
 
-    public static function upsertProduct($ref, $designation, $shortName, $tax, $obs, $stock, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean) {
-
+    public static function upsertProduct($ref, $designation, $shortName, $tax, $obs, $stock, $active, $shortDesc, $longDesc, $price, $vendorRef, $ean, $category) {
 
         // check if exists to always upsert
         $phcxOps = new PHCXOperations();
@@ -29,14 +28,33 @@ class ProductToPHCX extends Module
         // product exists ?
         $response = $phcxOps->query("StWS", array(array('column' => 'ref', 'value' => $ref)));
 
+        $status = PHCXOperations::ResponseStatus($response);
+        if ($status == 'nok') { return $status; }
+
         if (count($response['result']) != 0) {
+            // update existent product
+            $ststamp = $response['result'][0]['ststamp'];
 
-            //$result = $client->updateProduct("$session", "$ref", "$designation", "$shortName", "$tax", "$obs", "$stock", "$active", "$shortDesc", "$longDesc", "$price", "$vendorRef", "$ean");
-            var_dump("helo");
-            die();
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "ref", $ref));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "design", $designation));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "desctec", $longDesc));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "tipodesc", $obs));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "codigo", $ean));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "epv1iva", $tax));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "epv1", $price));
+            if ($status[0] == 'nok') { return $status; }
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "quantity", $stock));
+
+            $phcxOps->logout();
+
+            return $status;
         } else {
-            //$result = $client->insertProduct("$session", "$ref", "$designation", "$shortName", "$tax", "$obs", "$isService", "$hasStocks", "$active", "$shortDesc", "$longDesc", "$price", "$vendorRef", "$ean");
-
             // new product
             $result = $phcxOps->newInstance("StWS");
 
@@ -45,35 +63,22 @@ class ProductToPHCX extends Module
             $result['result'][0]['desctec'] = $longDesc;
             $result['result'][0]['tipodesc'] = $obs;
             $result['result'][0]['codigo'] = $ean;
-
-            //$result['result'][0]['tabiva'] = $tax;
             $result['result'][0]['epv1iva'] = $tax;
             $result['result'][0]['epv1'] = $price;
             $result['result'][0]['quantity'] = $stock;
 
+            if (self::saveProductCategory($phcxOps, $category)[0] == "ok") {
+                $result['result'][0]['familia'] = $category;
+                $result['result'][0]['faminome'] = $category;
+            }
+
 
             $result = $phcxOps->save("StWS", $result['result'][0]);
 
-            var_dump($result);
-            die();
+            $phcxOps->logout();
 
-/*
-ref 		=> reference
-stock 		=> quantity
-desctec 	=> description
-tabiva		=> $tax
-codigo		=> isset($product->ean13) ? $product->ean13 : '';
-
-[familia"]         => string(13) "Membranofones"
-["faminome"]         => string(62) "Instrumento cujo elemento vibratório é uma membrana retesada"
-
-tipodesc	=> "Produto inserido via PHCX Connector"
-desctec 	=> description
-*/
-
+            return PHCXOperations::ResponseStatus($result);
         }
-
-        return $result;
     }
 
     public static function saveByProductObject($product)
@@ -90,9 +95,8 @@ desctec 	=> description
             // if empty set 0 tax
             $tax = "0";
         }
-        $obs        = "Produto inserido via PHCX Connector";
+        $obs        = "PHCX Connector insert";
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
-        #$hasStocks  = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
         $stock      = (int)$product->getQuantity($product->id);
         $active     = isset($product->active) ? $product->active : '1';
         $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(ProductToPHCX::stringOrArray($product->description_short))) : 'N/A';
@@ -100,6 +104,7 @@ desctec 	=> description
         $price      = isset($product->price) ? $product->price : '';
         $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
         $ean        = isset($product->ean13) ? $product->ean13 : '';
+        $category   = isset($product->category) ? $product->category : '';
 
         return ProductToPHCX::upsertProduct(
             $ref,
@@ -113,7 +118,8 @@ desctec 	=> description
             $longDesc,
             $price,
             $vendorRef,
-            $ean
+            $ean,
+            $category
         );
     }
 
@@ -143,4 +149,24 @@ desctec 	=> description
         }
         return $data;
     }
+
+    // Save category to PHCX if it does not exists
+    private static function saveProductCategory($phcxOps, $category) {
+
+        $response = $phcxOps->query("StfamiWS", array(array('column' => 'ref', 'value' => $category)));
+        $status = PHCXOperations::ResponseStatus($response);
+        if ($status == 'nok') { return $status; }
+
+        if (count($response['result']) == 0) {
+            // new product
+            $result = $phcxOps->newInstance("StfamiWS");
+            $result['result'][0]['ref'] = $category;
+            $result['result'][0]['nome'] = $category;
+            $result = $phcxOps->save("StfamiWS", $result['result'][0]);
+            return PHCXOperations::ResponseStatus($result);
+        }
+
+        return array('ok', '');
+    }
+
 }
