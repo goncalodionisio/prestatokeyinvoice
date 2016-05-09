@@ -67,10 +67,12 @@ class ProductToPHCX extends Module
             $result['result'][0]['epv1'] = $price;
             $result['result'][0]['quantity'] = $stock;
 
+			/*
             if (self::saveProductCategory($phcxOps, $category)[0] == "ok") {
                 $result['result'][0]['familia'] = $category;
                 $result['result'][0]['faminome'] = $category;
             }
+			*/
 
 
             $result = $phcxOps->save("StWS", $result['result'][0]);
