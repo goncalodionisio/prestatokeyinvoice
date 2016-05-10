@@ -35,17 +35,17 @@ class ProductToPHCX extends Module
             // update existent product
             $ststamp = $response['result'][0]['ststamp'];
 
-            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "ref", $ref));
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "ref", '"'. $ref .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "design", $designation));
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "design", '"'. $designation .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "desctec", $longDesc));
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "desctec", '"'. $longDesc .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "tipodesc", $obs));
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "tipodesc", '"'. $obs .'"'));
             if ($status[0] == 'nok') { return $status; }
             $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "codigo", $ean));
             if ($status[0] == 'nok') { return $status; }
-            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "epv1iva", $tax));
+            $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "epv1iva", $tax)); //taxaiva
             if ($status[0] == 'nok') { return $status; }
             $status = PHCXOperations::ResponseStatus($phcxOps->update("StWS", $ststamp, "epv1", $price));
             if ($status[0] == 'nok') { return $status; }
@@ -67,13 +67,10 @@ class ProductToPHCX extends Module
             $result['result'][0]['epv1'] = $price;
             $result['result'][0]['quantity'] = $stock;
 
-			/*
             if (self::saveProductCategory($phcxOps, $category)[0] == "ok") {
-                $result['result'][0]['familia'] = $category;
-                $result['result'][0]['faminome'] = $category;
+                $result['result'][0]['familia'] = '"'. $category .'"';
+                $result['result'][0]['faminome'] = '"'. $category .'"';
             }
-			*/
-
 
             $result = $phcxOps->save("StWS", $result['result'][0]);
 
