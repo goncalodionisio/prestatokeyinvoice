@@ -194,8 +194,8 @@ class PrestaPTInvoice extends Module
             $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
 
             // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
-            //$ptinvoiceOps = new PTInvoiceOperations();
-            //$result = $ptinvoiceOps->login();
+            $ptinvoiceOps = new PTInvoiceOperations();
+            $result = $ptinvoiceOps->login();
 
             // new product
             //$result = $ptinvoiceOps->newInstance("StWS");
@@ -342,20 +342,13 @@ class PrestaPTInvoice extends Module
             return false;
         }
 
-        // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
-            $this->context->controller->errors[] = 'appID not defined';
-            return false;
-        }
-
         if ($params["object"] instanceof Address) {
             $result = ClientToPTInvoice::saveByIdAddress($params['object']->id);
             $location = Dispatcher::getInstance()->getController(); // page location
 
             if (isset($location) && $location == 'adminaddresses') {
-                if (isset($result) && $result[0] != '1') {
-                    $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                    $this->sendWSErrorResponse($result);
+                if (isset($result) && $result[0] != 'ok') {
+                    $this->context->controller->errors[] =utf8_decode($result[1]);
                 }
             }
         }
@@ -369,7 +362,7 @@ class PrestaPTInvoice extends Module
      */
     public function hookActionObjectAddressAddAfter($params)
     {
-        PTInvoiceConnector::addAndUpdateClients($params);
+        self::addAndUpdateClients($params);
     }
 
     // on address update action
@@ -378,7 +371,7 @@ class PrestaPTInvoice extends Module
      */
     public function hookActionObjectAddressUpdateAfter($params)
     {
-        PTInvoiceConnector::addAndUpdateClients($params);
+        self::addAndUpdateClients($params);
     }
 
     /**
@@ -393,7 +386,7 @@ class PrestaPTInvoice extends Module
         
         // Se a chave não existir coloca mensagem para o ecrã e sai
         if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
-            $this->context->controller->errors[] = 'appID not defined';
+            $this->context->controller->errors[] = 'PHCFX configs not defined';
             return false;
         }
 
@@ -423,23 +416,19 @@ class PrestaPTInvoice extends Module
      */
     public function hookDisplayAdminCustomers()
     {
+        if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
+            return false;
+        }
 
-        if (!$client = PTInvoiceConfigsValidation::APIWSClient()) {
-            return false;
-        }
-        if (!$session = PTInvoiceConfigsValidation::APIWSSession($client, 'ClientToPTInvoice')) {
-            return false;
-        }
-        if (Tools::isSubmit('PTInvoice_save_address')) {
-            $result = ClientToPTInvoice::saveByIdAddress(Tools::getValue('PTInvoice_address_radio'));
+        if (Tools::isSubmit('ptinvoice_save_address')) {
+            $result = ClientToPTInvoice::saveByIdAddress(Tools::getValue('ptinvoice_address_radio'));
 
             if (isset($result)) {
 
-                if ($result[0] != '1') {
-                    $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                    $this->sendWSErrorResponse($result);
+                if ($result[0] != 'ok') {
+                    $this->context->controller->errors[] =utf8_decode($result[1]);
                 } else {
-                    $this->context->smarty->assign('send_to_key_invoice_confirmation', "ok");
+                    $this->context->smarty->assign('send_to_pt_invoice_confirmation', "ok");
                 }
             }
         }
@@ -452,24 +441,28 @@ class PrestaPTInvoice extends Module
 
                 try {
                     $vat_number = $addr['vat_number'];
-                    $clientAddress = $client->getClient("$session", "$vat_number");
 
-                    if (isset($clientAddress) && isset($clientAddress->DAT) && isset($clientAddress->DAT[0]->Address)) {
+                    $address = ClientToPTInvoice::getAddress($vat_number);
+
+                    if (isset($address)) {
                         $addr1 = utf8_encode($addr['address1']);
                         $addr2 = utf8_encode($addr['address2']);
 
-                        if ($clientAddress->DAT[0]->Address == ($addr1 . ", " . $addr2)) {
+                        if (($address[0]['morada'].$address[0]['morada2']) == ($addr1.$addr2)) {
                             $selected_address = $addr['id_address'];
+
+                            //var_dump($address_list);
+                            //var_dump(($addr1.$addr2));
+                            //die();
                         }
                     }
-                } catch (Exception $e) {
-                    
-                }
+                } catch (Exception $e) {}
             }
 
             $this->context->smarty->assign('selected_address', $selected_address);
             $this->context->smarty->assign('address_list', $address_list);
         }
+
 
         return $this->display(__FILE__, 'displayAdminCustomers.tpl');
     }

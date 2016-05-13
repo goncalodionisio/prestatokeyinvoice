@@ -17,68 +17,95 @@ class ClientToPTInvoice extends Module
 {
 
     public static function upsertClient(
-        $nif,
-        $country_code,
-        $name,
-        $address,
-        $postalCode,
-        $locality,
-        $phone,
-        $fax,
+        $nome,
+        $ncont,
+        $telefone,
+        $tlmvl,
         $email,
+        $iban,
+        $nib,
+        $morada,
+        $morada2,
+        $local,
+        $codpost,
+        $pais,
         $obs
     ) {
 
-        if (!$client = ConfigsValidation::APIWSClient()) {
-            return false;
-        }
-        
-        if (!$session = ConfigsValidation::APIWSSession($client, 'ClientToPTInvoice')) {
-            return false;
-        }
-        
+
+        /*
+            "nome": "A Contradança, S.A.",
+            "ncont": "206677324",   nif
+            "telefone": "322 645 635",
+            "tlmvl": "922 373 838",
+            "email": "contradanca@musica.pt",
+            "iban": "",
+            "nib": "",
+            "morada": "Praça do Município, N4",
+            "morada2": "",
+            "local": "Porto",
+            "codpost": "4100-334",
+            "pais": "Portugal",
+        */
+
         // check if exists to always upsert
-        $clientExists = $client->clientExists("$session", "$nif");
-        $result = $clientExists[0];
-        
+        $ptinvoiceOps = new PTInvoiceOperations();
+        $response = $ptinvoiceOps->login();
 
+        if ($response[0] == "nok")
+            return $response;
 
-        if ($result == 1) {
-            $result = $client->updateClient(
-                "$session",
-                "$nif",
-                "$name",
-                "$address",
-                "$postalCode",
-                "$locality",
-                "$phone",
-                "$fax",
-                "$email",
-                "$obs"
-            );
+        // client exists
+        $response = $ptinvoiceOps->query("ClWS", array(array('column' => 'ncont', 'value' => $ncont)));
+        $status = PTInvoiceOperations::ResponseStatus($response);
+        if ($status[0] == 'nok') { return $status; }
 
+        if (count($response['result']) != 0) {
+            $ststamp = $response['result'][0]['clstamp'];
+
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "nome", '"'.$nome.'"'));  if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "ncont", $ncont));        if ($status[0] == 'nok') { return $status; }
+
+            if (isset($telefone)) {$status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "telefone", '"' . $telefone . '"'));   if ($status[0] == 'nok') { return $status; }}
+            if (isset($tlmvl)) {$status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "tlmvl", '"' . $tlmvl . '"'));            if ($status[0] == 'nok') { return $status; }}
+            if (isset($email)) {$status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "email", '"' . $email . '"'));            if ($status[0] == 'nok') { return $status; }}
+            if (isset($iban)) {$status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "iban", '"' . $iban . '"'));               if ($status[0] == 'nok') { return $status; }}
+            if (isset($nib)) {$status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "nib", '"' . $nib . '"'));                  if ($status[0] == 'nok') { return $status; }}
+
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "morada",  '"' . $morada . '"'));         if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "morada2", '"' . $morada2 . '"'));        if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "local", '"' . $local . '"'));            if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "codpost", '"' . $codpost . '"'));        if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($ptinvoiceOps->update("ClWS", $ststamp, "obs", '"' . $obs . '"'));                if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("ClWS", $ststamp, "pais", '"' . $pais . '"'));    if ($status[0] == 'nok') { return $status; }
+
+            $result = $ptinvoiceOps->save("ClWS", $result['result'][0]);
+
+            $ptinvoiceOps->logout();
+            return PTInvoiceOperations::ResponseStatus($result);
         } else {
-            $result = $client->insertClient(
-                "$session",
-                "$nif",
-                "$name",
-                "$address",
-                "$postalCode",
-                "$locality",
-                "$phone",
-                "$fax",
-                "$email",
-                "$obs"
-            );
+            // new customer
+            $result = $ptinvoiceOps->newInstance("ClWS",$params = array ('ndos' => 0));
 
-            /**
-             * não faz validação do nif mas não aceita o country por isso merda para isto
-             * $result = $client->insertForeignClient("$session", "$nif", "$country", 
-             * "$name", "$address", "$postalCode", "$locality", "$phone", "$fax", "$email", "$obs");
-            */
+            $result['result'][0]['nome'] = $nome;
+            $result['result'][0]['ncont'] = $ncont;
+            if (isset($telefone))   { $result['result'][0]['telefone'] = $telefone; }
+            if (isset($tlmvl))      { $result['result'][0]['tlmvl'] = $tlmvl; }
+            if (isset($email))      { $result['result'][0]['email'] = $email; }
+            if (isset($iban))       { $result['result'][0]['iban'] = $iban; }
+            if (isset($nib))        { $result['result'][0]['nib'] = $nib; }
+            $result['result'][0]['morada'] = $morada;
+            $result['result'][0]['morada2'] = $morada2;
+            $result['result'][0]['local'] = $local;
+            $result['result'][0]['codpost'] = $codpost;
+            $result['result'][0]['pais'] = $pais;
+
+            $result = $ptinvoiceOps->save("ClWS", $result['result'][0]);
+
+            $ptinvoiceOps->logout();
+            return PTInvoiceOperations::ResponseStatus($result);
         }
 
-        return $result;
     }
 
     public static function saveByAddressObject($address)
@@ -97,19 +124,19 @@ class ClientToPTInvoice extends Module
 
         $postcode   = isset($address->postcode) ? $address->postcode : "";
         $city       = isset($address->city) ? $address->city : "";
-        //$country    = isset($address->country) ? $address->country : "";
+        $country    = isset($address->country) ? $address->country : "";
 
-        # $obs        = isset($address->other) ? $address->other : "";
+        $obs        = isset($address->other) ? $address->other : "";
         $obs        = "Cliente criado via PTInvoice Connector";
         $phone      = isset($address->phone) ? $address->phone : "";
 
-        // transformações das colunas
-        $full_address = $address1 . ", " . $address2;
+        /*********************************************************************/
         $name = $company == "" ? ($first_name . " " . $last_name) : $company;
-        $locality = $city;
-        $postcode = $postcode ." ". $city;
         $fax = "";
-        $email = ""; # detail is empty
+        $email = null; # detail is empty
+        $tlmvl = null;
+        $iban = null;
+        $nib = null;
 
         if (Validate::isLoadedObject($customer = new Customer($address->id_customer))) {
             $email = $customer->email;
@@ -119,25 +146,35 @@ class ClientToPTInvoice extends Module
             return array(0, "numero VAT tem de ser preenchido");
         }
 
-        /**
-         * se o vat number não estiver preenchido então enviar erro.
-         * $country_code = DB::getInstance()->getValue(
-         * "SELECT iso_code FROM "._DB_PREFIX_."country a, 
-         * "._DB_PREFIX_."country_lang b WHERE a.id_country = b.id_country and b.name = '".$country."'");
-         */
-        
-        $country_code = "PT";
+        /*
+            "nome": "A Contradança, S.A.",
+            "ncont": "206677324",   nif
+            "telefone": "322 645 635",
+            "tlmvl": "922 373 838",
+            "email": "contradanca@musica.pt",
+            "iban": "",
+            "nib": "",
+            "morada": "Praça do Município, N4",
+            "morada2": "",
+            "local": "Porto",
+            "codpost": "4100-334",
+            "pais": "Portugal",
+            "obs": "",
+        */
 
         return ClientToPTInvoice::upsertClient(
-            $vat,
-            $country_code,
             $name,
-            $full_address,
-            $postcode,
-            $locality,
+            $vat,
             $phone,
-            $fax,
+            $tlmvl,
             $email,
+            $iban,
+            $nib,
+            $address1,
+            $address2,
+            $city,
+            $postcode,
+            $country,
             $obs
         );
     }
@@ -150,4 +187,30 @@ class ClientToPTInvoice extends Module
 
         return null;
     }
+
+    public static function getAddress($ncont)
+    {
+        // check if exists to always upsert
+        $ptinvoiceOps = new PTInvoiceOperations();
+        $response = $ptinvoiceOps->login();
+
+        if ($response[0] == "nok") {
+            $ptinvoiceOps->logout();
+            return null;
+        }
+
+        // client exists
+        $response = $ptinvoiceOps->query("ClWS", array(array('column' => 'ncont', 'value' => $ncont)));
+
+        $ptinvoiceOps->logout();
+
+        $status = PTInvoiceOperations::ResponseStatus($response);
+        if ($status[0] == 'nok' || count($response['result']) == 0) {
+            return null;
+        }
+
+        return $response['result'];
+    }
+
+
 }

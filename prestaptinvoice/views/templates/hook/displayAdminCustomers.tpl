@@ -14,7 +14,7 @@
  */
 *}
 
-{if isset($send_to_key_invoice_confirmation)}
+{if isset($send_to_pt_invoice_confirmation)}
     <div class="alert alert-success">{l s='Address Saved' mod='prestaptinvoice'}</div>
 {/if}
 
@@ -22,7 +22,7 @@
     <div class="panel">
         <div class="panel-heading">
             <i class="icon-eye"></i>
-            {l s='Customer Address Integration with KeyInvoice' mod='prestaptinvoice'}
+            {l s='Customer Address Integration with PHCFX' mod='prestaptinvoice'}
         </div>
         <form action="" method="post">
             <table class="table">
@@ -35,15 +35,15 @@
                         <td>{$address.firstname|escape:'htmlall':'UTF-8'} {$address.lastname|escape:'htmlall':'UTF-8'}</td>
                         <td>{$address.address1|escape:'htmlall':'UTF-8'}, {$address.address2|escape:'htmlall':'UTF-8'}</td>
                         <td>
-                            <input type="radio" name="keyinvoice_address_radio" value="{$address.id_address|escape:'htmlall':'UTF-8'}" {if $selected_address eq $address.id_address}checked{/if}>
+                            <input type="radio" name="ptinvoice_address_radio" value="{$address.id_address|escape:'htmlall':'UTF-8'}" {if $selected_address eq $address.id_address}checked{/if}>
                         </td>
                     </tr>
                 {/foreach}
                 </tbody>
             </table>
-            <button type="submit" name="keyinvoice_save_address" class="button btn btn-default button-medium">
+            <button type="submit" name="ptinvoice_save_address" class="button btn btn-default button-medium">
                 <span>
-                    {l s='Send to KeyInvoice' mod='prestaptinvoice'}
+                    {l s='Send to PHCFX' mod='prestaptinvoice'}
                     <i class="icon-chevron-right right"></i>
                 </span>
             </button>
