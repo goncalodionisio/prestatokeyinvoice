@@ -90,7 +90,9 @@ class ProductToPTInvoice extends Module
             $result['result'][0]['epv1'] = $price;
             $result['result'][0]['quantity'] = $stock;
 
-            if (self::saveProductCategory($ptinvoiceOps, $category)[0] == "ok") {
+			$catResult = self::saveProductCategory($ptinvoiceOps, $category)
+			
+            if (isset($catResult) && $catResult[0] == "ok") {
                 $result['result'][0]['familia'] = $category;
                 $result['result'][0]['faminome'] = $category;
             }

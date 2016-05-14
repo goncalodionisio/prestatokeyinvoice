@@ -194,8 +194,8 @@ class PrestaPTInvoice extends Module
             $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
 
             // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
-            $ptinvoiceOps = new PTInvoiceOperations();
-            $result = $ptinvoiceOps->login();
+            //$ptinvoiceOps = new PTInvoiceOperations();
+            //$result = $ptinvoiceOps->login();
 
             // new product
             //$result = $ptinvoiceOps->newInstance("StWS");
