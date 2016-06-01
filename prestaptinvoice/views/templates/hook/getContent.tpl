@@ -34,29 +34,79 @@
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
-                <legend>Session Config:</legend>
+                    <legend>Session Config:</legend>
                     <div class="form-group clearfix">
                         <div class="col-lg-10">
-                            <input type="text" placeholder="config_url" id="config_url" name="config_url" value="{$config_url|escape:'htmlall':'UTF-8'}" />
-                         </div>
+                            <input type="text" placeholder="http phcfx url" id="config_url" name="config_url" value="{$config_url|escape:'htmlall':'UTF-8'}" />
+                        </div>
+                        <div class="col-lg-2">
+                            {if empty($config_url)}
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif !isset($config_url)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
+                        </div>
                         <div class="col-lg-10">
                             <input type="text" placeholder="username" id="username" name="username" value="{$username|escape:'htmlall':'UTF-8'}" />
                          </div>
+                        <div class="col-lg-2">
+                            {if empty($username)}
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif !isset($username)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
+                        </div>
                         <div class="col-lg-10">
                             <input type="password" placeholder="password" id="password" name="password" value="{$password|escape:'htmlall':'UTF-8'}" />
                          </div>
+                        <div class="col-lg-2">
+                            {if empty($password)}
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif !isset($password)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
+                        </div>
                         <div class="col-lg-10">
                             <input type="text" placeholder="appID" id="appID" name="appID" value="{$appID|escape:'htmlall':'UTF-8'}" />
+                        </div>
+                        <div class="col-lg-2">
+                            {if empty($appID)}
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif !isset($appID)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
                         </div>
                         <div class="col-lg-10">
                             <input type="text" placeholder="company" id="ptinvoice_company" name="ptinvoice_company" value="{$ptinvoice_company|escape:'htmlall':'UTF-8'}" />
                         </div>
+                        <div class="col-lg-2">
+                            {if empty($ptinvoice_company)}
+                                <img src="../img/admin/status_orange.png" alt="" />
+                            {elseif !isset($ptinvoice_company)}
+                                <img src="../img/admin/status_red.png" alt="" />
+                            {else}
+                                <img src="../img/admin/status_green.png" alt="" />
+                            {/if}
+                        </div>
+                    </div>
                 </fieldset>
             </div>        
             <div class="col-lg-6">
                 <fieldset>
-                <legend class="text-center">{l s='Help' mod='prestaptinvoice'}:</legend>
-                    <p class="text-justify">- {l s='Save here your PHC credentials.' mod='prestaptinvoice'}</p>
+                    <legend class="text-center">{l s='Help' mod='prestaptinvoice'}:</legend>
+                    <div class="form-group clearfix">
+                        <div class="col-lg-12">
+                            <p class="text-justify">- {l s='PHCFX credentials' mod='prestaptinvoice'}</p>
+                        </div>
+                    </div>
                 </fieldset>
             </div>
         </div>
