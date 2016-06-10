@@ -154,7 +154,7 @@ class PTInvoiceOperations extends Module
     public static function ResponseStatus($response)
     {
         if (empty($response))
-            return array("nok", "Can't connect to webservice!! There's an empty response");
+            return array("nok", utf8_encode("Can't connect to webservice!! There's an empty response"));
         else if ($response == null)
             return array("nok", "Unknown error");
         else if(isset($response['messages'][0]))

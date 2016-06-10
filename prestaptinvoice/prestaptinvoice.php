@@ -192,29 +192,6 @@ class PrestaPTInvoice extends Module
 
             PTInvoiceConfigsValidation::setcompany(Tools::getValue('ptinvoice_company'));
             $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
-
-            // DEMO PARA TESTAR AUTENTICACAO COM SUCESSO
-            //$ptinvoiceOps = new PTInvoiceOperations();
-            //$result = $ptinvoiceOps->login();
-
-            // new product
-            //$result = $ptinvoiceOps->newInstance("StWS");
-
-            // $result['result'][0]['ref'] = "xuxinhas";
-            // $result['result'][0]['design'] = "xuxinhas";
-            // $result = $ptinvoiceOps->save("StWS", $result['result'][0]);
-
-            // get product (duas formas de fazer o select)
-            // $fields = array(array('column' => 'ref', 'value' => 'xuxinhas'), array('column' => 'design', 'value' => 'xuxinhas'));
-            //$fields = array(array('column' => 'ref', 'value' => 'A001'));
-            //$result = $ptinvoiceOps->query("StWS", $fields);
-            //var_dump($result);
-            //die();
-
-            // update
-            // $result = $ptinvoiceOps->update("StWS", "0f4-453d-beec-5e603ac5a3a", "design", "\"xuxitas\"");
-
-            // $result = $ptinvoiceOps->logout();
         }
     }
 
@@ -321,7 +298,13 @@ class PrestaPTInvoice extends Module
         }
 
         if ($id_product = (int)Tools::getValue('id_product')) {
-            $result = ProductToPTInvoice::saveByIdProduct($id_product);
+            $ptinvoiceOps = new PTInvoiceOperations();
+            $result = $ptinvoiceOps->login();
+
+            if ($result[0] != "nok") {
+                $result = ProductToPTInvoice::saveByIdProduct($ptinvoiceOps, $id_product);
+                $ptinvoiceOps->logout();
+            }
 
             if ($result[0] == "nok") {
                 $this->context->controller->errors[] =utf8_decode($result[1]);
@@ -450,10 +433,6 @@ class PrestaPTInvoice extends Module
 
                         if (($address[0]['morada'].$address[0]['morada2']) == ($addr1.$addr2)) {
                             $selected_address = $addr['id_address'];
-
-                            //var_dump($address_list);
-                            //var_dump(($addr1.$addr2));
-                            //die();
                         }
                     }
                 } catch (Exception $e) {}

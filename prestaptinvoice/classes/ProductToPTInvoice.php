@@ -34,7 +34,7 @@ class ProductToPTInvoice extends Module
      * @param $manufacturer
      * @return array|mixed
      */
-    public static function upsertProduct(
+    public static function upsertProduct($ptinvoiceOps,
         $ref,
         $designation,
         $shortName,
@@ -52,13 +52,6 @@ class ProductToPTInvoice extends Module
         $manufacturer
     ) {
 
-        // check if exists to always upsert
-        $ptinvoiceOps = new PTInvoiceOperations();
-        $response = $ptinvoiceOps->login();
-
-        if ($response[0] == "nok")
-            return $response;
-
         // product exists ?
         $response = $ptinvoiceOps->query("StWS", array(array('column' => 'ref', 'value' => $ref)));
         $status = PTInvoiceOperations::ResponseStatus($response);
@@ -68,11 +61,12 @@ class ProductToPTInvoice extends Module
             // update existent product
             $ststamp = $response['result'][0]['ststamp'];
 
+
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "ref", '"'. $ref .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "design", '"'. $designation .'"'));
+            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "design", '"'. utf8_decode($designation) .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "desctec", '"'. $shortDesc .'\n'. $longDesc .'"'));
+            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "desctec", '"'. utf8_decode($shortDesc) .'\n'. utf8_decode($longDesc) .'"'));
             if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "obs", '"'. $obs .'"'));
             if ($status[0] == 'nok') { return $status; }
@@ -85,7 +79,6 @@ class ProductToPTInvoice extends Module
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
             if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
-
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "tabiva", $ivaStatus[1]));
             if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "taxaiva", $tax));
@@ -107,7 +100,6 @@ class ProductToPTInvoice extends Module
 
             $result = $ptinvoiceOps->save("StWS", $result['result'][0]);
 
-            $ptinvoiceOps->logout();
             return PTInvoiceOperations::ResponseStatus($result);
         } else {
             // new product
@@ -139,7 +131,6 @@ class ProductToPTInvoice extends Module
 
             $result = $ptinvoiceOps->save("StWS", $result['result'][0]);
 
-            $ptinvoiceOps->logout();
             return PTInvoiceOperations::ResponseStatus($result);
         }
     }
@@ -148,7 +139,7 @@ class ProductToPTInvoice extends Module
      * @param $product
      * @return array|mixed
      */
-    public static function saveByProductObject($product)
+    public static function saveByProductObject($ptinvoiceOps, $product)
     {
 
         $ref = isset($product->reference) ? $product->reference : 'N/A';
@@ -177,7 +168,7 @@ class ProductToPTInvoice extends Module
             $manufacturer = '';
         }
 
-        return ProductToPTInvoice::upsertProduct(
+        return ProductToPTInvoice::upsertProduct($ptinvoiceOps,
             $ref,
             $designation,
             $shortName,
@@ -200,7 +191,7 @@ class ProductToPTInvoice extends Module
      * @param $idProduct
      * @return array|mixed|null
      */
-    public static function saveByIdProduct($idProduct)
+    public static function saveByIdProduct($ptinvoiceOps, $idProduct)
     {
         $default_language = Configuration::get('PS_LANG_DEFAULT');
         $default_shop_id = Configuration::get('PS_SHOP_DEFAULT');
@@ -214,7 +205,7 @@ class ProductToPTInvoice extends Module
                 null
             )
         )) {
-            return ProductToPTInvoice::saveByProductObject($product);
+            return ProductToPTInvoice::saveByProductObject($ptinvoiceOps, $product);
         }
         return null;
     }
@@ -242,9 +233,8 @@ class ProductToPTInvoice extends Module
 
         $response = $ptinvoiceOps->query("StfamiWS", array(array('column' => 'ref', 'value' => $category)));
         $status = PTInvoiceOperations::ResponseStatus($response);
-        if ($status == 'nok') { return $status; }
 
-        //var_dump($response);
+        if ($status == 'nok') { return $status; }
 
         if (count($response['result']) == 0) {
             // new product
@@ -263,32 +253,25 @@ class ProductToPTInvoice extends Module
         // product exists ?
         $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'taxa', 'value' => $value)));
         $status = PTInvoiceOperations::ResponseStatus($response);
+
         if ($status[0] == 'nok') { return $status; }
 
         if (count($response['result']) != 0) {
-            return array('ok', $response['result'][0]['codigo']);
-        } else {
-            $result = $ptinvoiceOps->newInstance("IVAWS",$params = array ('ndos' => 0));
+            $ivaCode = $response['result'][0]['codigo'];
+            $ivaDataIni = strtotime($response['result'][0]['dataini']);
 
-            $result['result'][0]['taxa'] = $value;
-            $result['result'][0]['taxarecargo'] = 0;
-            $result['result'][0]['regiao'] = "PT";
-            $result['result'][0]['codigoimposto'] = "NOR";
-            $result['result'][0]['descricaoimposto'] = "Normal";
-            $result['result'][0]['revisionNumber'] = 0;
+            $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'codigo', 'value' => $ivaCode)));
 
-            $ptinvoiceOps->save("IVAWS", $result['result'][0]);
-
-            $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'taxa', 'value' => $value)));
-            $status = PTInvoiceOperations::ResponseStatus($response);
-            if ($status[0] == 'nok') { return $status; }
-
-            if (count($response['result']) != 0) {
-                return array('ok', $response['result'][0]['codigo']);
+            foreach($response['result'] as $item) {
+                if ($ivaDataIni < strtotime($item['dataini'])) {
+                    return array('nok', 'Iva is not active in PHCFX');
+                }
             }
 
-            // dont no what to do.
-            return array('ok', '0');
+            return array('ok', $response['result'][0]['codigo']);
+
+        } else {
+            return array('nok', 'Iva does not exists in PHCFX');
         }
     }
 
