@@ -44,12 +44,13 @@ class ProductToPTInvoice extends Module
         $active,
         $shortDesc,
         $longDesc,
-        $price,
+        $cost_price,
         $vendorRef,
         $ean,
         $category,
         $isService,
-        $manufacturer
+        $manufacturer,
+        $sell_price
     ) {
 
         // product exists ?
@@ -74,8 +75,10 @@ class ProductToPTInvoice extends Module
             if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "usr1", '"'. $manufacturer .'"'));
             if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "epcusto", $price));
+            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "epcusto", $cost_price));
             if ($status[0] == 'nok') { return $status; } //preço de custo
+            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "epv1", $sell_price));
+            if ($status[0] == 'nok') { return $status; } //preço de sell
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
             if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
@@ -111,7 +114,9 @@ class ProductToPTInvoice extends Module
             $result['result'][0]['obs'] = $obs;
             $result['result'][0]['codigo'] = $ean;
             $result['result'][0]['quantity'] = $stock;
-            $result['result'][0]['epcusto'] = $price;
+            $result['result'][0]['epcusto'] = $cost_price;
+            $result['result'][0]['epv1'] = $sell_price;
+
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
             if ($ivaStatus[0] == 'nok') { return $status; }
@@ -141,7 +146,6 @@ class ProductToPTInvoice extends Module
      */
     public static function saveByProductObject($ptinvoiceOps, $product)
     {
-
         $ref = isset($product->reference) ? $product->reference : 'N/A';
         $designation = isset($product->name) ? utf8_encode(ProductToPTInvoice::stringOrArray($product->name)) : 'N/A';
         $shortName = 'N/A';
@@ -158,7 +162,8 @@ class ProductToPTInvoice extends Module
         $active     = isset($product->active) ? $product->active : '1';
         $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description_short))) : 'N/A';
         $longDesc   = isset($product->description) ? utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description))) : 'N/A';
-        $price      = isset($product->price) ? $product->price : '';
+        $sell_price      = isset($product->price) ? $product->price : '0'; // preco de venda sem iva
+        $cost_price      = isset($product->wholesale_price) ? $product->wholesale_price : '0'; // preco de compra sem iva
         $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
         $ean        = isset($product->ean13) ? $product->ean13 : '';
         $category   = isset($product->category) ? $product->category : '';
@@ -178,12 +183,13 @@ class ProductToPTInvoice extends Module
             $active,
             $shortDesc,
             $longDesc,
-            $price,
+            $cost_price,
             $vendorRef,
             $ean,
             $category,
             $isService,
-            $manufacturer
+            $manufacturer,
+            $sell_price
         );
     }
 
