@@ -17,6 +17,7 @@ class ProductToPTInvoice extends Module
 {
 
     /**
+     * @param $ptinvoiceOps
      * @param $ref
      * @param $designation
      * @param $shortName
@@ -26,13 +27,15 @@ class ProductToPTInvoice extends Module
      * @param $active
      * @param $shortDesc
      * @param $longDesc
-     * @param $price
+     * @param $cost_price
      * @param $vendorRef
      * @param $ean
      * @param $category
      * @param $isService
      * @param $manufacturer
+     * @param $sell_price
      * @return array|mixed
+     * @internal param $price
      */
     public static function upsertProduct($ptinvoiceOps,
         $ref,
@@ -82,12 +85,13 @@ class ProductToPTInvoice extends Module
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
             if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
+
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "tabiva", $ivaStatus[1]));
             if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "taxaiva", $tax));
             if ($status[0] == 'nok') { return $status; } //taxaiva
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "quantity", $stock));
-            if ($status[0] == 'nok') { return $status; }
+            # $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "quantity", $stock));
+            # if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "inactivo", ($active == '1' ? false : true)));
             if ($status[0] == 'nok') { return $status; }
             $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "stns", (($isService == '1') ? true : false)));
@@ -113,13 +117,12 @@ class ProductToPTInvoice extends Module
             $result['result'][0]['desctec'] = $shortDesc .'\n'. $longDesc;
             $result['result'][0]['obs'] = $obs;
             $result['result'][0]['codigo'] = $ean;
-            $result['result'][0]['quantity'] = $stock;
+            # $result['result'][0]['quantity'] = $stock;
             $result['result'][0]['epcusto'] = $cost_price;
             $result['result'][0]['epv1'] = $sell_price;
 
-
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
-            if ($ivaStatus[0] == 'nok') { return $status; }
+            if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
 
             $result['result'][0]['tabiva'] = $ivaStatus[1];
             $result['result'][0]['taxaiva'] = $tax;

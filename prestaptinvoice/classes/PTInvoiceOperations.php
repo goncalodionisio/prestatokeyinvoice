@@ -158,8 +158,21 @@ class PTInvoiceOperations extends Module
         else if ($response == null)
             return array("nok", "Unknown error");
         else if(isset($response['messages'][0]))
-            return array("nok", $response['messages'][0]);
-        else
+        {
+            if (is_array($response['messages'][0]))
+            {
+                $responseArray = $response['messages'][0];
+
+                if (isset($responseArray['messageCodeLocale']))
+                    return array("nok", utf8_encode($responseArray['messageCodeLocale']));
+                else
+                    return array("nok", 'PHCFX error cannot be parsed.');
+            }
+            else
+            {
+                return array("nok", utf8_encode($response['messages'][0]));
+            }
+        } else
             return array("ok", "");
     }
 }
