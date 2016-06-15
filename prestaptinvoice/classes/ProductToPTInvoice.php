@@ -273,14 +273,14 @@ class ProductToPTInvoice extends Module
 
             foreach($response['result'] as $item) {
                 if ($ivaDataIni < strtotime($item['dataini'])) {
-                    return array('nok', 'Iva is not active in PHCFX');
+                    return array('nok', 'VAT value not defined');
                 }
             }
 
             return array('ok', $response['result'][0]['codigo']);
 
         } else {
-            return array('nok', 'Iva does not exists in PHCFX');
+            return array('nok', 'VAT does not exists in PHCFX');
         }
     }
 
