@@ -36,65 +36,25 @@
                 <fieldset>
                     <legend>Session Config:</legend>
                     <div class="form-group clearfix">
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
+                            <label for="config_url">url:</label>
                             <input type="text" placeholder="http phcfx url" id="config_url" name="config_url" value="{$config_url|escape:'htmlall':'UTF-8'}" />
                         </div>
-                        <div class="col-lg-2">
-                            {if empty($config_url)}
-                                <img src="../img/admin/status_orange.png" alt="" />
-                            {elseif !isset($config_url)}
-                                <img src="../img/admin/status_red.png" alt="" />
-                            {else}
-                                <img src="../img/admin/status_green.png" alt="" />
-                            {/if}
-                        </div>
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
+                            <label for="username">username:</label>
                             <input type="text" placeholder="username" id="username" name="username" value="{$username|escape:'htmlall':'UTF-8'}" />
                          </div>
-                        <div class="col-lg-2">
-                            {if empty($username)}
-                                <img src="../img/admin/status_orange.png" alt="" />
-                            {elseif !isset($username)}
-                                <img src="../img/admin/status_red.png" alt="" />
-                            {else}
-                                <img src="../img/admin/status_green.png" alt="" />
-                            {/if}
-                        </div>
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
+                            <label for="password">password:</label>
                             <input type="password" placeholder="password" id="password" name="password" value="{$password|escape:'htmlall':'UTF-8'}" />
                          </div>
-                        <div class="col-lg-2">
-                            {if empty($password)}
-                                <img src="../img/admin/status_orange.png" alt="" />
-                            {elseif !isset($password)}
-                                <img src="../img/admin/status_red.png" alt="" />
-                            {else}
-                                <img src="../img/admin/status_green.png" alt="" />
-                            {/if}
-                        </div>
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
+                            <label for="appID">appID:</label>
                             <input type="text" placeholder="appID" id="appID" name="appID" value="{$appID|escape:'htmlall':'UTF-8'}" />
                         </div>
-                        <div class="col-lg-2">
-                            {if empty($appID)}
-                                <img src="../img/admin/status_orange.png" alt="" />
-                            {elseif !isset($appID)}
-                                <img src="../img/admin/status_red.png" alt="" />
-                            {else}
-                                <img src="../img/admin/status_green.png" alt="" />
-                            {/if}
-                        </div>
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
+                            <label for="ptinvoice_company">company:</label>
                             <input type="text" placeholder="company" id="ptinvoice_company" name="ptinvoice_company" value="{$ptinvoice_company|escape:'htmlall':'UTF-8'}" />
-                        </div>
-                        <div class="col-lg-2">
-                            {if empty($ptinvoice_company)}
-                                <img src="../img/admin/status_orange.png" alt="" />
-                            {elseif !isset($ptinvoice_company)}
-                                <img src="../img/admin/status_red.png" alt="" />
-                            {else}
-                                <img src="../img/admin/status_green.png" alt="" />
-                            {/if}
                         </div>
                     </div>
                 </fieldset>
@@ -176,7 +136,7 @@
                             {html_options name=PTInvoice_SHIP_DOC_TYPE options=$ShipdocOptions selected=$ShipdefaultSelect}
                         {else}
                             {html_options name=PTInvoice_SHIP_DOC_TYPE disabled="disabled" options=$ShipdocOptions selected=$ShipdefaultSelect}
-                            <input type="hidden" id="PTInvoice_SHIP_DOC_TYPE_hidden" name="PTInvoice_SHIP_DOC_TYPE" value="{13|escape:'htmlall':'UTF-8'}" />
+                            <input type="hidden" id="PTInvoice_SHIP_DOC_TYPE_hidden" name="PTInvoice_SHIP_DOC_TYPE" value="{1|escape:'htmlall':'UTF-8'}" />
                         {/if}
                     </div>
                     {*

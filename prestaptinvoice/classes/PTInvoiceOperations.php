@@ -84,6 +84,19 @@ class PTInvoiceOperations extends Module
         return $this->runOperation($url, $params);
     }
 
+
+    /**
+     * @param $objType
+     * @param $method
+     * @param $params
+     * @return mixed
+     */
+    function sendOperation($objType, $method, $params)
+    {
+        $url = "/REST/{$objType}/{$method}";
+        return $this->runOperation($url, $params);
+    }
+
     /**
      * @param $objType
      * @param $result
@@ -92,7 +105,7 @@ class PTInvoiceOperations extends Module
     function save($objType, $result)
     {
         $url = "/REST/{$objType}/Save";
-        $params = array ('itemVO' => json_encode($result), 'runWarningRules' => 'false');
+        $params = array ('itemVO' => ToolsCore::jsonEncode($result), 'runWarningRules' => 'false');
 
         return $this->runOperation($url, $params);
     }

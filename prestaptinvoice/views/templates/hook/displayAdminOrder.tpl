@@ -37,7 +37,7 @@
         *}
          <div class="col-lg-12">  
             <div class="submit">
-                <button type="submit" name="process_sync_order" class="button btn btn-default button-medium"><span>{l s='Send to KeyInvoice' mod='prestaptinvoice'} <i class="icon-chevron-right right"></i></span></button>
+                <button type="submit" name="process_sync_order" class="button btn btn-default button-medium"><span>{l s='Send to PTInvoice' mod='prestaptinvoice'} <i class="icon-chevron-right right"></i></span></button>
             </div>
         </div>
         </form>

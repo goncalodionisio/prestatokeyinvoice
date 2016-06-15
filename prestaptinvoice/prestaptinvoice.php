@@ -48,12 +48,6 @@ class PrestaPTInvoice extends Module
             return false;
         }
 
-        // Execute module install SQL statements
-        $sql_file = dirname(__FILE__).'/install/install.sql';
-        if (!$this->loadSQLFile($sql_file)) {
-            return false;
-        }
-
         if (!$this->registerHook('displayAdminOrder') ||
         !$this->registerHook('actionProductSave') ||
         !$this->registerHook('orderConfirmation') ||
@@ -75,38 +69,9 @@ class PrestaPTInvoice extends Module
             return false;
         }
 
-        // Execute module install SQL statements
-        $sql_file = dirname(__FILE__).'/install/uninstall.sql';
-        if (!$this->loadSQLFile($sql_file)) {
-            return false;
-        }
         // Delete configuration values
         PTInvoiceConfigsValidation::deleteByName();
         return true;
-    }
-
-    /**
-     * @param $sql_file
-     * @return bool
-     */
-    public function loadSQLFile($sql_file)
-    {
-        // Get install SQL file content
-        $sql_content = Tools::file_get_contents($sql_file);
-
-        // Replace prefix and store SQL command in array
-        $sql_content = str_replace('PREFIX_', _DB_PREFIX_, $sql_content);
-        $sql_requests = preg_split("/;\s*[\r\n]+/", $sql_content);
-
-        // Execute each SQL statement
-        $result = true;
-        foreach ($sql_requests as $request) {
-            if (!empty($request)) {
-                $result &= Db::getInstance()->execute(trim($request));
-            }
-        }
-        // Return result
-        return $result;
     }
 
     /**
@@ -114,18 +79,17 @@ class PrestaPTInvoice extends Module
      */
     public function assignDocTypeInv()
     {
-
         $getDoctype = Configuration::get('PTInvoice_INV_DOC_TYPE');
-        $defaultSelect = isset($getDoctype) ? $getDoctype : '13';
-        
+        $defaultSelect = isset($getDoctype) ? $getDoctype : '1';
+
         $this->context->smarty->assign(
             'InvdocOptions',
             array(
-            4 => 'Factura',
-            7 => 'Nota de Crédito',
-            13 => 'Encomenda',
-            32 => 'Factura Simplificada',
-            34 => 'Factura-Recibo')
+                1 => 'Factura',
+                2 => 'Guia de Remessa',
+                6 => 'Factura Proforma',
+                8 => 'Factura Simplificada',
+                7 => 'Factura-Recibo')
         );
         $this->context->smarty->assign('InvdefaultSelect', $defaultSelect);
     }
@@ -137,16 +101,16 @@ class PrestaPTInvoice extends Module
     {
 
         $getDoctype = Configuration::get('PTInvoice_SHIP_DOC_TYPE');
-        $defaultSelect = isset($getDoctype) ? $getDoctype : '13';
+        $defaultSelect = isset($getDoctype) ? $getDoctype : '1';
 
         $this->context->smarty->assign(
             'ShipdocOptions',
             array(
-            4 => 'Factura',
-            13 => 'Encomenda',
-            15 => 'Guia de Remessa',
-            32 => 'Factura Simplificada',
-            34 => 'Factura-Recibo')
+                1 => 'Factura',
+                2 => 'Guia de Remessa',
+                6 => 'Factura Proforma',
+                8 => 'Factura Simplificada',
+                7 => 'Factura-Recibo')
         );
         $this->context->smarty->assign('ShipdefaultSelect', $defaultSelect);
     }
@@ -242,43 +206,10 @@ class PrestaPTInvoice extends Module
     {
         $this->processConfiguration();
         $this->assignConfiguration();
-        /*
-        $userLoginServiceUser = new UserLoginServiceUser();
-
-        if ($userLoginServiceUser->userLogin(new UserLoginStructUserLogin($user_login, $user_pass, $appID))) {
-            echo "<br>38 ok_login<br><br>"; // in case of login ok
-            print_r($userLoginServiceUser->getResult()); // --> you can see here also the result of the login
-            echo "<br> 40 end_ok_login<br><br>"; 
-        }
-        */
         return $this->display(__FILE__, 'getContent.tpl');
     }
 
     ##################################### Module Config End ##############################################
-
-    // vai buscar reposta do webservice que já estão na bd local.
-    /**
-     * @param $result
-     * @return false|null|string
-     */
-    public function getWSResponse($result)
-    {
-        $message = DB::getInstance()->getValue(
-            'SELECT message FROM `'._DB_PREFIX_.'PTInvoice_response` WHERE `code` = "'.(string)$result.'"'
-        );
-        return isset($message) ? $message : "Resposta indefinida!";
-    }
-
-    /**
-     * @param $result
-     */
-    public function sendWSErrorResponse($result)
-    {
-        if (count($result) > 0 && $result[0] != '1') {
-            $message = (count($result) == 1) ? $result[0] : ($result[0] . " - " . $result[1]);
-            $this->context->controller->errors[] =utf8_decode($message);
-        }
-    }
 
     // on product save action
     /**
@@ -381,11 +312,11 @@ class PrestaPTInvoice extends Module
         if (Tools::isSubmit('process_sync_order')) {
 
             $result = OrderToPTInvoice::sendOrderToPTInvoice($id_order, 'hookDisplayAdminOrder');
-            if (isset($result) && $result[0] != '1') {
-                $result[0] = utf8_encode($this->getWSResponse($result[0]));
-                $this->sendWSErrorResponse($result);
-                
-            } elseif (isset($result) && $result[0] == '1') {
+            if ($result[0] == "nok") {
+
+                $this->context->controller->errors[] =utf8_decode($result[1]);
+            }
+            else {
                 
                 $this->context->smarty->assign('confirmation_ok', $result);
             }
