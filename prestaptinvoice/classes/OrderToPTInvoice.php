@@ -178,11 +178,12 @@ class OrderToPTInvoice extends Module
 
             // add products
             if (count($newFt['result']) == 1) {
-                // produtos
+
                 if (!$cartProducts = $order->getCartProducts()) {
                     return false;
                 }
-                foreach ($cartProducts as $cartProduct) {
+                foreach ($cartProducts as $key => $cartProduct) {
+
 
                     // upsert product
                     ProductToPTInvoice::saveByIdProduct($ptinvoiceOps,$cartProduct['product_id']);
@@ -193,23 +194,21 @@ class OrderToPTInvoice extends Module
                     $newFt = $ptinvoiceOps->sendOperation("FtWS", "addNewFIsByRef", $params = array('IdFtStamp' => $IdFtStamp, 'refsIds' => '["' . $product_reference . '"]', 'fiStampEditing' => ""));
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') { return $status; }
-                    // $product_name = isset($cartProduct['product_name']) ? $cartProduct['product_name'] : 'N/A';
+
                     $product_quantity = isset($cartProduct['product_quantity']) ?
                         $cartProduct['product_quantity'] : '0';
                     $product_price = isset($cartProduct['product_price']) ? $cartProduct['product_price'] : '0';
-                    $tax = PTInvoiceConnectorGetValueByID::getTaxByRulesGroup($cartProduct['id_tax_rules_group']);
-                    $discount = '0';
-
 
                     //Quantity and Price of FT
-                    $newFt['result'][0]['qtt'] = $product_quantity;
-                    $newFt['result'][0]['epv'] = $product_price;
+                    $newFt['result'][0]['fis'][$key]['qtt'] = $product_quantity;
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt['result'][0]['fis'][$key]['epv'] = $product_price;
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
 
 
                 }
 
                 // sync shipping
-                // retira o produto criado como transporta no lado do key
                 $shipping = $order->getShipping();
 
                 if ($shipping[0]['shipping_cost_tax_excl'] != "0.000000") {
@@ -217,9 +216,11 @@ class OrderToPTInvoice extends Module
                     $newFt = $ptinvoiceOps->sendOperation("FtWS", "addNewFIsByRef", $params = array('IdFtStamp' => $IdFtStamp, 'refsIds' => '["' . $shipping_reference . '"]', 'fiStampEditing' => ""));
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') { return $status; }
+
                     //Quantity and Price of FT
-                    $newFt['result'][0]['qtt'] = 1;
-                    $newFt['result'][0]['epv'] = $shipping[0]['shipping_cost_tax_excl'];
+                    $newFt['result'][0]['fis'][COUNT($cartProducts)]['qtt'] = 1;
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt['result'][0]['fis'][COUNT($cartProducts)]['epv'] = $shipping[0]['shipping_cost_tax_excl'];
                     $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') { return $status; }
@@ -227,12 +228,6 @@ class OrderToPTInvoice extends Module
 
                 //Associate client to FT
                 $newFt['result'][0]['no'] = $client['result'][0]['no'];
-                $newFt['result'][0]['desconto'] = 0;
-                $newFt['result'][0]['desc2'] = 0;
-                $newFt['result'][0]['desc3'] = 0;
-                $newFt['result'][0]['desc4'] = 0;
-                $newFt['result'][0]['desc5'] = 0;
-                $newFt['result'][0]['desc6'] = 0;
 
                 //Eliminate financial discount of client
                 $newFt['result'][0]['efinv'] = 0;
@@ -247,22 +242,6 @@ class OrderToPTInvoice extends Module
                 if ($status[0] == 'nok') { return $status; }
                 $ptinvoiceOps->logout();
 
-                /*
-                if ($address_delivery) {
-
-                    $result = OrderToPTInvoice::sendShippingAddr(
-                        $session,
-                        $client,
-                        $docID,
-                        $getDocTypeShip,
-                        $order_reference,
-                        $address_delivery
-                    );
-                    if (isset($result) && $result[0] != '1') {
-                        return $result;
-                    }
-                }
-                */
                 $getDiscounts = $order->getDiscounts();
                 if ($getDiscounts) {
                     return array(-969,
@@ -273,7 +252,6 @@ class OrderToPTInvoice extends Module
 
                 return PTInvoiceOperations::ResponseStatus($result);
             }
-
         }
     }
 }
