@@ -45,14 +45,12 @@ class OrderToPTInvoice extends Module
 
             $ptinvoiceOps = new PTInvoiceOperations();
             $response = $ptinvoiceOps->login();
-
             if ($response[0] == "nok")
                 return $response;
 
 
             // se transportadora do presta nao for igual no PTInvoice
             $result = $ptinvoiceOps->query("StWS", array(array('column' => 'ref', 'value' => $shipping_reference)));
-
             if (count($result['result']) == 0) {
                 return array(-969,
                     "Aten&ccedil;&atilde;o transportadora \"$shipping_reference\" n&atilde;o se encontra 
@@ -113,9 +111,9 @@ class OrderToPTInvoice extends Module
 
                     //Quantity and Price of FT
                     $newFt['result'][0]['fis'][$key]['qtt'] = $product_quantity;
-                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => Tools::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => Tools::jsonEncode([])));
                     $newFt['result'][0]['fis'][$key]['epv'] = $product_price;
-                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => Tools::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => Tools::jsonEncode([])));
 
                 }
 
@@ -130,9 +128,9 @@ class OrderToPTInvoice extends Module
 
                     //Quantity and Price of FT
                     $newFt['result'][0]['fis'][COUNT($cartProducts)]['qtt'] = 1;
-                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => Tools::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => Tools::jsonEncode([])));
                     $newFt['result'][0]['fis'][COUNT($cartProducts)]['epv'] = $shipping[0]['shipping_cost_tax_excl'];
-                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                    $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => Tools::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => Tools::jsonEncode([])));
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') { return $status; }
                 }
@@ -144,7 +142,7 @@ class OrderToPTInvoice extends Module
                 $newFt['result'][0]['efinv'] = 0;
                 $newFt['result'][0]['fin'] = 0;
 
-                $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => ToolsCore::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => ToolsCore::jsonEncode([])));
+                $newFt = $ptinvoiceOps->sendOperation("FtWS", "actEntity", $params = array('entity' => Tools::jsonEncode($newFt['result'][0]), 'code' => 0, 'newValue' => Tools::jsonEncode([])));
                 $status = PTInvoiceOperations::ResponseStatus($newFt);
                 if ($status[0] == 'nok') { return $status; }
 
