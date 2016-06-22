@@ -156,7 +156,7 @@ class OrderToPTInvoice extends ModuleCore
                         $params = array(
                             'entity' => Tools::jsonEncode($newFt['result'][0]),
                             'code' => 0,
-                            'newValue' => Tools::jsonEncode([]))
+                            'newValue' => Tools::jsonEncode('[]'))
                     );
                     $newFt['result'][0]['fis'][$key]['epv'] = $product_price;
                     $newFt = $ptinvoiceOps->sendOperation(
@@ -165,7 +165,7 @@ class OrderToPTInvoice extends ModuleCore
                         $params = array(
                             'entity' => Tools::jsonEncode($newFt['result'][0]),
                             'code' => 0,
-                            'newValue' => Tools::jsonEncode([]))
+                            'newValue' => Tools::jsonEncode('[]'))
                     );
 
                 }
@@ -197,7 +197,7 @@ class OrderToPTInvoice extends ModuleCore
                         $params = array(
                             'entity' => Tools::jsonEncode($newFt['result'][0]),
                             'code' => 0,
-                            'newValue' => Tools::jsonEncode([]))
+                            'newValue' => Tools::jsonEncode('[]'))
                     );
 
                     $newFt['result'][0]['fis'][count($cartProducts)]['epv']
@@ -209,7 +209,7 @@ class OrderToPTInvoice extends ModuleCore
                         $params = array(
                             'entity' => Tools::jsonEncode($newFt['result'][0]),
                             'code' => 0,
-                            'newValue' => Tools::jsonEncode([]))
+                            'newValue' => Tools::jsonEncode('[]'))
                     );
 
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
@@ -231,7 +231,7 @@ class OrderToPTInvoice extends ModuleCore
                     $params = array(
                         'entity' => Tools::jsonEncode($newFt['result'][0]),
                         'code' => 0,
-                        'newValue' => Tools::jsonEncode([]))
+                        'newValue' => Tools::jsonEncode('[]'))
                 );
                 $status = PTInvoiceOperations::ResponseStatus($newFt);
                 if ($status[0] == 'nok') {
