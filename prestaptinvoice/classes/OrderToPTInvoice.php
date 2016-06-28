@@ -42,7 +42,7 @@ class OrderToPTInvoice extends ModuleCore
             // se nao estiver configurada transportadora no presta
             $shipping_reference = ConfigurationCore::get('PTInvoice_SHIPPINGCOST');
             if (empty($shipping_reference)) {
-                return array(-969,
+                return array("nok",
                     "Aten&ccedil;&atilde;o transportadora n&atilde;o se encontra 
                     configurada no PTInvoice Connector! Encomenda n&atilde;o 
                     sincronizada!"
@@ -63,7 +63,7 @@ class OrderToPTInvoice extends ModuleCore
                     'value' => $shipping_reference))
             );
             if (count($result['result']) == 0) {
-                return array(-969,
+                return array("nok",
                     "Aten&ccedil;&atilde;o transportadora \"$shipping_reference\" 
                     n&atilde;o se encontra configurada no PHCX! Encomenda 
                     n&atilde;o sincronizada!"
