@@ -271,6 +271,12 @@ class ProductToPTInvoice extends Module
 
             $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'codigo', 'value' => $ivaCode)));
 
+			foreach($response['result'] as $item) {
+                if ($ivaDataIni < strtotime($item['dataini']) && strval($value) == strval($item['taxa'])) {
+                    $ivaDataIni = strtotime($item['dataini']);
+                }
+            }
+			
             foreach($response['result'] as $item) {
                 if ($ivaDataIni < strtotime($item['dataini'])) {
                     return array('nok', 'VAT value not defined');
