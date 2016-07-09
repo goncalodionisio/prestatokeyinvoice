@@ -16,7 +16,6 @@
 class OrderToPTInvoice extends ModuleCore
 {
 
-
     /**
      * @param $id_order
      * @param $from
@@ -24,6 +23,12 @@ class OrderToPTInvoice extends ModuleCore
      */
     public static function sendOrderToPTInvoice($id_order, $from)
     {
+
+
+        $datetime = new DateTime();
+        $datetime->modify('+ 1 Hour');
+        $horacarga = $datetime->format('H:i:s');
+
         if (ValidateCore::isLoadedObject($order = new OrderCore($id_order))) {
 
             $getDiscounts = $order->getCartRules();
@@ -119,6 +124,7 @@ class OrderToPTInvoice extends ModuleCore
                 if (!$cartProducts = $order->getCartProducts()) {
                     return false;
                 }
+
                 foreach ($cartProducts as $key => $cartProduct) {
 
                     // upsert product
@@ -145,8 +151,8 @@ class OrderToPTInvoice extends ModuleCore
 
                     $product_quantity = isset($cartProduct['product_quantity']) ?
                         $cartProduct['product_quantity'] : '0';
-                    $product_price = isset($cartProduct['product_price']) ?
-                        $cartProduct['product_price'] : '0';
+                    $product_price = isset($cartProduct['unit_price_tax_incl']) ?
+                        $cartProduct['unit_price_tax_incl'] : '0';
 
                     //Quantity and Price of FT
                     $newFt['result'][0]['fis'][$key]['qtt'] = $product_quantity;
@@ -158,6 +164,11 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
+                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    if ($status[0] == 'nok') {
+                        return $status;
+                    }
+
                     $newFt['result'][0]['fis'][$key]['epv'] = $product_price;
                     $newFt = $ptinvoiceOps->sendOperation(
                         "FtWS",
@@ -167,13 +178,31 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
+                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    if ($status[0] == 'nok') {
+                        return $status;
+                    }
+
+                    $newFt['result'][0]['fis'][$key]['ivaincl'] = true;
+                    $newFt = $ptinvoiceOps->sendOperation(
+                        "FtWS",
+                        "actEntity",
+                        $params = array(
+                            'entity' => Tools::jsonEncode($newFt['result'][0]),
+                            'code' => 0,
+                            'newValue' => Tools::jsonEncode('[]'))
+                    );
+                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    if ($status[0] == 'nok') {
+                        return $status;
+                    }
 
                 }
 
                 // sync shipping
                 $shipping = $order->getShipping();
 
-                if ($shipping[0]['shipping_cost_tax_excl'] != "0.000000") {
+                if ($shipping[0]['shipping_cost_tax_incl'] != "0.000000") {
 
                     $newFt = $ptinvoiceOps->sendOperation(
                         "FtWS",
@@ -183,13 +212,12 @@ class OrderToPTInvoice extends ModuleCore
                             'refsIds' => '["' . $shipping_reference . '"]',
                             'fiStampEditing' => "")
                     );
-
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
 
-                    //Quantity and Price of FT
+                    //Quantity of FT
                     $newFt['result'][0]['fis'][count($cartProducts)]['qtt'] = 1;
                     $newFt = $ptinvoiceOps->sendOperation(
                         "FtWS",
@@ -199,10 +227,14 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
+                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    if ($status[0] == 'nok') {
+                        return $status;
+                    }
 
+                    // price
                     $newFt['result'][0]['fis'][count($cartProducts)]['epv']
-                        = $shipping[0]['shipping_cost_tax_excl'];
-
+                        = $shipping[0]['shipping_cost_tax_incl'];
                     $newFt = $ptinvoiceOps->sendOperation(
                         "FtWS",
                         "actEntity",
@@ -211,7 +243,21 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
+                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    if ($status[0] == 'nok') {
+                        return $status;
+                    }
 
+                    // inclui iva
+                    $newFt['result'][0]['fis'][count($cartProducts)]['ivaincl'] = true;
+                    $newFt = $ptinvoiceOps->sendOperation(
+                        "FtWS",
+                        "actEntity",
+                        $params = array(
+                            'entity' => Tools::jsonEncode($newFt['result'][0]),
+                            'code' => 0,
+                            'newValue' => Tools::jsonEncode('[]'))
+                    );
                     $status = PTInvoiceOperations::ResponseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
@@ -224,6 +270,9 @@ class OrderToPTInvoice extends ModuleCore
                 //Eliminate financial discount of client
                 $newFt['result'][0]['efinv'] = 0;
                 $newFt['result'][0]['fin'] = 0;
+                $newFt['result'][0]['hcarga'] = $horacarga;
+                $newFt['result'][0]['local'] = "pt";
+                $newFt['result'][0]['ivaincl'] = true;
 
                 $newFt = $ptinvoiceOps->sendOperation(
                     "FtWS",
