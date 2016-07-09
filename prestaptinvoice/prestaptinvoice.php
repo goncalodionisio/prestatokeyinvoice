@@ -53,6 +53,7 @@ class PrestaPTInvoice extends Module
         !$this->registerHook('orderConfirmation') ||
         !$this->registerHook('actionObjectAddressUpdateAfter') ||
         !$this->registerHook('actionObjectAddressAddAfter') ||
+        !$this->registerHook('actionValidateOrder') ||
         !$this->registerHook('displayAdminCustomers')) {
             return false;
         }
@@ -288,42 +289,6 @@ class PrestaPTInvoice extends Module
         self::addAndUpdateClients($params);
     }
 
-    /**
-     * @return bool
-     */
-    public function hookDisplayAdminOrder()
-    {
-        // sai se não for para sincronizar com a api das encomendas
-        if (!PTInvoiceConfigsValidation::syncOrders()) {
-            return false;
-        }
-        
-        // Se a chave não existir coloca mensagem para o ecrã e sai
-        if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
-            $this->context->controller->errors[] = 'PHCFX configs not defined';
-            return false;
-        }
-
-        $id_order = (int)Tools::getValue('id_order');
-
-        // doctype drop box
-        $this->assignDocTypeShip();
-        //$this->assignDocTypeInv();
-        if (Tools::isSubmit('process_sync_order')) {
-
-            $result = OrderToPTInvoice::sendOrderToPTInvoice($id_order, 'hookDisplayAdminOrder');
-            if ($result[0] == "nok") {
-
-                $this->context->controller->errors[] =utf8_decode($result[1]);
-            }
-            else {
-                
-                $this->context->smarty->assign('confirmation_ok', $result);
-            }
-        }
-
-         return $this->display(__FILE__, 'displayAdminOrder.tpl');
-    }
 
     /**
      * @return bool
@@ -377,12 +342,46 @@ class PrestaPTInvoice extends Module
         return $this->display(__FILE__, 'displayAdminCustomers.tpl');
     }
 
+    /**
+     * @return bool
+     */
+    public function hookDisplayAdminOrder()
+    {
+
+        // Se a chave não existir coloca mensagem para o ecrã e sai
+        if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
+            $this->context->controller->errors[] = 'PHCFX configs not defined';
+            return false;
+        }
+
+        $id_order = (int)Tools::getValue('id_order');
+
+        // doctype drop box
+        $this->assignDocTypeShip();
+        //$this->assignDocTypeInv();
+        if (Tools::isSubmit('process_sync_order')) {
+
+            $result = OrderToPTInvoice::sendOrderToPTInvoice($id_order, 'hookDisplayAdminOrder');
+            if ($result[0] == "nok") {
+
+                $this->context->controller->errors[] =utf8_decode($result[1]);
+            }
+            else {
+
+                $this->context->smarty->assign('confirmation_ok', $result);
+            }
+        }
+
+        return $this->display(__FILE__, 'displayAdminOrder.tpl');
+    }
+
     // frontend
     /**
      * @return bool
      */
     public function hookOrderConfirmation()
     {
+
         // sai se não for para sincronizar com a api das encomendas
         if (!PTInvoiceConfigsValidation::syncOrders()) {
             return false;
@@ -399,5 +398,29 @@ class PrestaPTInvoice extends Module
         /*
         * TODO: notificar admin de orders nao sincronizadas via frontend
         */
+    }
+
+    public function hookActionValidateOrder($params)
+    {
+
+        // sai se não for para sincronizar com a api das encomendas
+        if (!PTInvoiceConfigsValidation::syncOrders()) {
+            return false;
+        }
+
+        // Se a chave não existir coloca mensagem para o ecrã e sai
+        if (!PTInvoiceConfigsValidation::PTInvoiceIdExists()) {
+            return false;
+        }
+
+        $id_cart = (int)Tools::getValue('id_cart');
+        $id_order = OrderCore::getOrderByCartId($id_cart);
+        $result = OrderToPTInvoice::sendOrderToPTInvoice($id_order, 'hookOrderConfirmation');
+
+        if ($result[0] == "nok") {
+
+           $this->context->controller->errors[] =utf8_decode($result[1]);
+        }
+        return true;
     }
 }
