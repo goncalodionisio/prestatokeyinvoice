@@ -35,6 +35,7 @@ class OrderToPTInvoice extends ModuleCore
             if (($getDiscounts) && ($from == 'hookOrderConfirmation')) {
                 return false;
             }
+
             if ($from == 'hookDisplayAdminOrder') {
 
                 $getDocTypeShip = Tools::getValue('PTInvoice_SHIP_DOC_TYPE');
@@ -74,7 +75,7 @@ class OrderToPTInvoice extends ModuleCore
                     n&atilde;o sincronizada!"
                 );
             }
-
+            
             //$getDocTypeInv  = Tools::getValue('PTInvoice_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
             //$address_delivery = new AddressCore($order->id_address_delivery);
@@ -103,6 +104,7 @@ class OrderToPTInvoice extends ModuleCore
             );
             $status = PTInvoiceOperations::ResponseStatus($client);
             if ($status[0] == 'nok') {
+
                 return $status;
             }
 
