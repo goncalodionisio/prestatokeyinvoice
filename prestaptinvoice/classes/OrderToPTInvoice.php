@@ -50,7 +50,7 @@ class OrderToPTInvoice extends ModuleCore
             if (empty($shipping_reference)) {
                 return array("nok",
                     "Aten&ccedil;&atilde;o transportadora n&atilde;o se encontra 
-                    configurada no PTInvoice Connector! Encomenda n&atilde;o 
+                    configurada no Presta PT Invoice! Encomenda n&atilde;o
                     sincronizada!"
                 );
             }
@@ -300,7 +300,7 @@ class OrderToPTInvoice extends ModuleCore
                 if ($getDiscounts) {
                     return array(-969,
                         "Aten&ccedil;&atilde;o h&aacute; descontos por sicronizar
-                    nesta encomenda no PTInvoice Connector!"
+                    nesta encomenda no Presta PT Invoice!"
                     );
                 }
 

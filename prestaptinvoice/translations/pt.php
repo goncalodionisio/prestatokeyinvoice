@@ -2,13 +2,13 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{prestaptinvoice}prestashop>prestaptinvoice_ba9b0ec6acf6aa0176a1c94e14c71599'] = ' KeyInvoice Connector';
+$_MODULE['<{prestaptinvoice}prestashop>prestaptinvoice_ba9b0ec6acf6aa0176a1c94e14c71599'] = ' Presta PT Invoice';
 $_MODULE['<{prestaptinvoice}prestashop>prestaptinvoice_57596ac48822ba9683945355b97a37cd'] = 'Integração com o sistema de faturação KeyInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadmincustomers_53474f0f5f9732759d884ff23573f40b'] = 'Cliente Guardado';
 $_MODULE['<{prestaptinvoice}prestashop>displayadmincustomers_6acdf7ae74e475d916ad54905ebd5350'] = 'Actualização Clientes no KeyInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadmincustomers_ecdc8612489244cde4df70b6c880a8a0'] = 'Enviar para o PTInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadminorder_ae08a037d2c439885e962d476a17b358'] = 'Encomenda Criada no KeyInvoice';
-$_MODULE['<{prestaptinvoice}prestashop>displayadminorder_ba9b0ec6acf6aa0176a1c94e14c71599'] = ' KeyInvoice Connector';
+$_MODULE['<{prestaptinvoice}prestashop>displayadminorder_ba9b0ec6acf6aa0176a1c94e14c71599'] = ' Presta PT Invoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadminorder_4f67fe16b274bf31a67539fbedb8f8d3'] = 'Tipo de Documento';
 $_MODULE['<{prestaptinvoice}prestashop>displayadminorder_ecdc8612489244cde4df70b6c880a8a0'] = 'Enviar para o PTInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadminproductsextra_a3ed1ac957c5b3334cecd87c0aaafd63'] = 'Não foi possível contactar o KeyInvoice, tente mais tarde. ';

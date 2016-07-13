@@ -159,7 +159,7 @@ class ProductToPTInvoice extends Module
             // if empty set 0 tax
             $tax = "0";
         }
-        $obs        = "Produto criado via PTInvoice Connector";
+        $obs        = "Produto criado via Presta PT Invoice";
         $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
         $stock      = (int)$product->getQuantity($product->id);
         $active     = isset($product->active) ? $product->active : '1';

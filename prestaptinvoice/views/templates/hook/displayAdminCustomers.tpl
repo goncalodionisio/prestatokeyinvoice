@@ -22,7 +22,7 @@
     <div class="panel">
         <div class="panel-heading">
             <i class="icon-eye"></i>
-            {l s='Customer Address Integration with PHCFX' mod='prestaptinvoice'}
+            {l s='Customer Integration with Presta PT Invoice' mod='prestaptinvoice'}
         </div>
         <form action="" method="post">
             <table class="table">
@@ -43,7 +43,7 @@
             </table>
             <button type="submit" name="ptinvoice_save_address" class="button btn btn-default button-medium">
                 <span>
-                    {l s='Send to PHCFX' mod='prestaptinvoice'}
+                    {l s='Send to PT Invoice' mod='prestaptinvoice'}
                     <i class="icon-chevron-right right"></i>
                 </span>
             </button>

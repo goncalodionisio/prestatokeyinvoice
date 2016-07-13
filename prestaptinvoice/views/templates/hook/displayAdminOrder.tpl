@@ -18,7 +18,7 @@
     <div class="alert alert-success">{l s='Order Created in PTInvoice' mod='prestaptinvoice'}</div>
 {/if}
 <div class="panel col-lg-6">
-    <h3 class="tab"> <i class="icon-info"></i> {l s='KeyInvoice Connector' mod='prestaptinvoice'}</h3>
+    <h3 class="tab"> <i class="icon-info"></i> {l s='Presta PT Invoice' mod='prestaptinvoice'}</h3>
     <div class="form-group clearfix">
         <form action="" method="post" id="send-order-keyinvoice" >
         <div class="col-lg-12">

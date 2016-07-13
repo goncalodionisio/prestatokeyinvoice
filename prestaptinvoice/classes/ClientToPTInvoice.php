@@ -127,7 +127,7 @@ class ClientToPTInvoice extends Module
         $country    = isset($address->country) ? $address->country : "";
 
         $obs        = isset($address->other) ? $address->other : "";
-        $obs        = "Cliente criado via PTInvoice Connector";
+        $obs        = "Cliente criado via Presta PT Invoice";
         $phone      = isset($address->phone) ? $address->phone : "";
 
         /*********************************************************************/
