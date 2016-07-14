@@ -50,7 +50,7 @@ class OrderToPTInvoice extends ModuleCore
             if (empty($shipping_reference)) {
                 return array("nok",
                     "Aten&ccedil;&atilde;o transportadora n&atilde;o se encontra 
-                    configurada no Presta PT Invoice! Encomenda n&atilde;o
+                    configurada no PTInvoice Connector! Encomenda n&atilde;o 
                     sincronizada!"
                 );
             }
@@ -78,7 +78,13 @@ class OrderToPTInvoice extends ModuleCore
             
             //$getDocTypeInv  = Tools::getValue('PTInvoice_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
-            //$address_delivery = new AddressCore($order->id_address_delivery);
+            $address_delivery = new AddressCore($order->id_address_delivery);
+
+            $address1 = isset($address_delivery->address1) ? $address_delivery->address1 : 'n/a' ;
+            $address2 = isset($address_delivery->address2) ? $address_delivery->address1 : 'n/a' ;
+            $postcode = isset($address_delivery->postcode) ? $address_delivery->address1 : '0000-000' ;
+            $city = isset($address_delivery->city) ? $address_delivery->address1 : 'n/a' ;
+
 
             // upsert customer
             $response = ClientToPTInvoice::saveByIdAddress(
@@ -119,6 +125,22 @@ class OrderToPTInvoice extends ModuleCore
 
             // get stamp
             $IdFtStamp = $newFt['result'][0]['ftstamp'];
+
+            // se for guia de remessa preenche morada entrega
+            if ($getDocTypeShip == 2):
+
+                $newFt['result'][0]['morada'] = $address1.' '.$address2;
+                $newFt['result'][0]['local'] = $city;
+                $newFt['result'][0]['codpost'] = $postcode;
+                $newFt = $ptinvoiceOps->sendOperation(
+                    "FtWS",
+                    "actEntity",
+                    $params = array(
+                        'entity' => Tools::jsonEncode($newFt['result'][0]),
+                        'code' => 0,
+                        'newValue' => Tools::jsonEncode('[]'))
+                );
+            endif;
 
             // add products
             if (count($newFt['result']) == 1) {
@@ -289,6 +311,7 @@ class OrderToPTInvoice extends ModuleCore
                     return $status;
                 }
 
+
                 $result = $ptinvoiceOps->save("FtWS", $newFt['result'][0]);
                 $status = PTInvoiceOperations::ResponseStatus($result);
                 if ($status[0] == 'nok') {
@@ -300,7 +323,7 @@ class OrderToPTInvoice extends ModuleCore
                 if ($getDiscounts) {
                     return array(-969,
                         "Aten&ccedil;&atilde;o h&aacute; descontos por sicronizar
-                    nesta encomenda no Presta PT Invoice!"
+                    nesta encomenda no PTInvoice Connector!"
                     );
                 }
 
