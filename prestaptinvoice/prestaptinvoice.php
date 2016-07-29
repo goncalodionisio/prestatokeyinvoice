@@ -32,6 +32,7 @@ class PrestaPTInvoice extends Module
         $this->version = '1.0.0';
         $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
+		$this->module_key = 'c7d055713b0edeb5943ca84cfd88ab32';
         parent::__construct();
         $this->displayName = $this->l('Presta PT Invoice');
         $this->description = $this->l('Provides integration with Portuguese Authorized Billing Solution');
