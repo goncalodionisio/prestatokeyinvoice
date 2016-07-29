@@ -288,6 +288,7 @@ class ClientToPTInvoice extends Module
 
         /*********************************************************************/
         $name = $company == "" ? ($first_name . " " . $last_name) : $company;
+        $fax = "";
         $email = null;
         $tlmvl = null;
         $iban = null;
