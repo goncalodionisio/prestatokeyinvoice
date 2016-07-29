@@ -11,5 +11,3 @@ echo'<html>
 </body>
 </html>';
 
-
-?>

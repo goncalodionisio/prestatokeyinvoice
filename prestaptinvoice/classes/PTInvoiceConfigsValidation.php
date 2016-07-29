@@ -8,16 +8,10 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Majoinfa - Sociedade Unipessoal Lda
- *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
- *  @license   LICENSE.txt
-*/
-
-/*
- * Date: 14-02-2016
- * Time: 16:23
- *
-*/
+ * @author    Majoinfa - Sociedade Unipessoal Lda
+ * @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ * @license   LICENSE.txt
+ */
 
 class PTInvoiceConfigsValidation extends Module
 {
@@ -64,7 +58,7 @@ class PTInvoiceConfigsValidation extends Module
 
         }
 
-        $kiapi_auth =  $client->authenticate("$kiapi_key");
+        $kiapi_auth = $client->authenticate("$kiapi_key");
         if ($kiapi_auth[0] != 1) {
 
             return false;
@@ -210,7 +204,7 @@ class PTInvoiceConfigsValidation extends Module
     /**
      * @param $value
      */
-    public static function setconfig_url($value)
+    public static function setconfigurl($value)
     {
         Configuration::updateValue('PTInvoice_CONFIG_URL', $value);
     }

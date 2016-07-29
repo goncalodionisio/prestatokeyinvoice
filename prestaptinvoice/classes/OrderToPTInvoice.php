@@ -8,9 +8,9 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Majoinfa - Sociedade Unipessoal Lda <info@majoinfa.pt>
- *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
- *  @license   LICENSE.txt
+ * @author    Majoinfa - Sociedade Unipessoal Lda <info@majoinfa.pt>
+ * @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ * @license   LICENSE.txt
  */
 
 class OrderToPTInvoice extends ModuleCore
@@ -75,28 +75,28 @@ class OrderToPTInvoice extends ModuleCore
                     n&atilde;o sincronizada!"
                 );
             }
-            
+
             //$getDocTypeInv  = Tools::getValue('PTInvoice_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
             $address_delivery = new AddressCore($order->id_address_delivery);
 
-            $address1 = isset($address_delivery->address1) ? $address_delivery->address1 : 'n/a' ;
-            $address2 = isset($address_delivery->address2) ? $address_delivery->address1 : 'n/a' ;
-            $postcode = isset($address_delivery->postcode) ? $address_delivery->address1 : '0000-000' ;
-            $city = isset($address_delivery->city) ? $address_delivery->address1 : 'n/a' ;
+            $address1 = isset($address_delivery->address1) ? $address_delivery->address1 : 'n/a';
+            $address2 = isset($address_delivery->address2) ? $address_delivery->address1 : 'n/a';
+            $postcode = isset($address_delivery->postcode) ? $address_delivery->address1 : '0000-000';
+            $city = isset($address_delivery->city) ? $address_delivery->address1 : 'n/a';
 
 
             // upsert customer
             $response = ClientToPTInvoice::saveByIdAddress(
                 $order->id_address_invoice
             );
-            $status = PTInvoiceOperations::ResponseStatus($response);
+            $status = PTInvoiceOperations::responseStatus($response);
             if ($status[0] == 'nok') {
                 return null;
             }
 
             $vat_number = isset($address_invoice->vat_number)
-                ? $address_invoice->vat_number : '' ;
+                ? $address_invoice->vat_number : '';
 
             $response = $ptinvoiceOps->login();
             if ($response[0] == "nok") {
@@ -108,17 +108,15 @@ class OrderToPTInvoice extends ModuleCore
                 "ClWS",
                 array(array('column' => 'ncont', 'value' => $vat_number))
             );
-            $status = PTInvoiceOperations::ResponseStatus($client);
+            $status = PTInvoiceOperations::responseStatus($client);
             if ($status[0] == 'nok') {
 
                 return $status;
             }
 
-            $newFt = $ptinvoiceOps->newInstance(
-                "FtWS", $params = array( 'ndos' => $getDocTypeShip)
-            );
+            $newFt = $ptinvoiceOps->newInstance("FtWS", $params = array('ndos' => $getDocTypeShip));
 
-            $status = PTInvoiceOperations::ResponseStatus($newFt);
+            $status = PTInvoiceOperations::responseStatus($newFt);
             if ($status[0] == 'nok') {
                 return $status;
             }
@@ -127,9 +125,9 @@ class OrderToPTInvoice extends ModuleCore
             $IdFtStamp = $newFt['result'][0]['ftstamp'];
 
             // se for guia de remessa preenche morada entrega
-            if ($getDocTypeShip == 2):
+            if ($getDocTypeShip == 2) :
 
-                $newFt['result'][0]['morada'] = $address1.' '.$address2;
+                $newFt['result'][0]['morada'] = $address1 . ' ' . $address2;
                 $newFt['result'][0]['local'] = $city;
                 $newFt['result'][0]['codpost'] = $postcode;
                 $newFt = $ptinvoiceOps->sendOperation(
@@ -153,7 +151,8 @@ class OrderToPTInvoice extends ModuleCore
 
                     // upsert product
                     ProductToPTInvoice::saveByIdProduct(
-                        $ptinvoiceOps, $cartProduct['product_id']
+                        $ptinvoiceOps,
+                        $cartProduct['product_id']
                     );
 
                     $product_reference = isset($cartProduct['product_reference']) ?
@@ -168,7 +167,7 @@ class OrderToPTInvoice extends ModuleCore
                             'fiStampEditing' => "")
                     );
 
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -188,7 +187,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -202,7 +201,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -216,7 +215,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -236,7 +235,7 @@ class OrderToPTInvoice extends ModuleCore
                             'refsIds' => '["' . $shipping_reference . '"]',
                             'fiStampEditing' => "")
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -251,7 +250,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -267,7 +266,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -282,7 +281,7 @@ class OrderToPTInvoice extends ModuleCore
                             'code' => 0,
                             'newValue' => Tools::jsonEncode('[]'))
                     );
-                    $status = PTInvoiceOperations::ResponseStatus($newFt);
+                    $status = PTInvoiceOperations::responseStatus($newFt);
                     if ($status[0] == 'nok') {
                         return $status;
                     }
@@ -306,14 +305,14 @@ class OrderToPTInvoice extends ModuleCore
                         'code' => 0,
                         'newValue' => Tools::jsonEncode('[]'))
                 );
-                $status = PTInvoiceOperations::ResponseStatus($newFt);
+                $status = PTInvoiceOperations::responseStatus($newFt);
                 if ($status[0] == 'nok') {
                     return $status;
                 }
 
 
                 $result = $ptinvoiceOps->save("FtWS", $newFt['result'][0]);
-                $status = PTInvoiceOperations::ResponseStatus($result);
+                $status = PTInvoiceOperations::responseStatus($result);
                 if ($status[0] == 'nok') {
                     return $status;
                 }
@@ -327,7 +326,7 @@ class OrderToPTInvoice extends ModuleCore
                     );
                 }
 
-                return PTInvoiceOperations::ResponseStatus($result);
+                return PTInvoiceOperations::responseStatus($result);
             }
         }
     }

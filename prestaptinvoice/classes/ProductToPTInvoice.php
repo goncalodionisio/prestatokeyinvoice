@@ -8,13 +8,14 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Majoinfa - Sociedade Unipessoal Lda
- *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
- *  @license   LICENSE.txt
-*/
+ * @author    Majoinfa - Sociedade Unipessoal Lda
+ * @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ * @license   LICENSE.txt
+ */
 
 class ProductToPTInvoice extends Module
 {
+
 
     /**
      * @param $ptinvoiceOps
@@ -34,10 +35,13 @@ class ProductToPTInvoice extends Module
      * @param $isService
      * @param $manufacturer
      * @param $sell_price
-     * @return array|mixed
-     * @internal param $price
+     *
+     * @return array
+     *
+     * @since version
      */
-    public static function upsertProduct($ptinvoiceOps,
+    public static function upsertProduct(
+        $ptinvoiceOps,
         $ref,
         $designation,
         $shortName,
@@ -58,71 +62,201 @@ class ProductToPTInvoice extends Module
 
         // product exists ?
         $response = $ptinvoiceOps->query("StWS", array(array('column' => 'ref', 'value' => $ref)));
-        $status = PTInvoiceOperations::ResponseStatus($response);
-        if ($status[0] == 'nok') { return $status; }
+        $status = PTInvoiceOperations::responseStatus($response);
+        if ($status[0] == 'nok') {
+            return $status;
+        }
 
         if (count($response['result']) != 0) {
             // update existent product
             $ststamp = $response['result'][0]['ststamp'];
 
 
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "ref", '"'. $ref .'"'));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "design", '"'. utf8_decode($designation) .'"'));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "desctec", '"'. utf8_decode($shortDesc) .'\n'. utf8_decode($longDesc) .'"'));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "obs", '"'. $obs .'"'));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "codigo", $ean));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "usr1", '"'. $manufacturer .'"'));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "epcusto", $cost_price));
-            if ($status[0] == 'nok') { return $status; } //preço de custo
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "epv1", $sell_price));
-            if ($status[0] == 'nok') { return $status; } //preço de sell
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "ref",
+                    '"' . $ref . '"'
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "design",
+                    '"' . utf8_decode($designation) . '"'
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "desctec",
+                    '"' . utf8_decode($shortDesc) . '\n' . utf8_decode($longDesc) . '"'
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "obs",
+                    '"' . $obs . '"'
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "codigo",
+                    $ean
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "usr1",
+                    '"' . $manufacturer . '"'
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "epcusto",
+                    $cost_price
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            } //preço de custo
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "epv1",
+                    $sell_price
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            } //preço de sell
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
-            if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
+            if ($ivaStatus[0] == 'nok') {
+                return $ivaStatus;
+            }
 
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "tabiva", $ivaStatus[1]));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "taxaiva", $tax));
-            if ($status[0] == 'nok') { return $status; } //taxaiva
-            # $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "quantity", $stock));
-            # if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "inactivo", ($active == '1' ? false : true)));
-            if ($status[0] == 'nok') { return $status; }
-            $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "stns", (($isService == '1') ? true : false)));
-            if ($status[0] == 'nok') { return $status; }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "tabiva",
+                    $ivaStatus[1]
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "taxaiva",
+                    $tax
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "inactivo",
+                    ($active == '1' ? false : true)
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
+            $status = PTInvoiceOperations::responseStatus(
+                $result = $ptinvoiceOps->update(
+                    "StWS",
+                    $ststamp,
+                    "stns",
+                    (($isService == '1') ? true : false)
+                )
+            );
+            if ($status[0] == 'nok') {
+                return $status;
+            }
 
             $catResult = self::saveProductCategory($ptinvoiceOps, $category);
             if (isset($catResult) && $catResult[0] == "ok") {
-                $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "familia", '"'. $category .'"'));
-                if ($status[0] == 'nok') { return $status; }
-                $status = PTInvoiceOperations::ResponseStatus($result = $ptinvoiceOps->update("StWS", $ststamp, "faminome", '"'. $category .'"'));
-                if ($status[0] == 'nok') { return $status; }
+                $status = PTInvoiceOperations::responseStatus(
+                    $result = $ptinvoiceOps->update(
+                        "StWS",
+                        $ststamp,
+                        "familia",
+                        '"' . $category . '"'
+                    )
+                );
+                if ($status[0] == 'nok') {
+                    return $status;
+                }
+                $status = PTInvoiceOperations::responseStatus(
+                    $result = $ptinvoiceOps->update(
+                        "StWS",
+                        $ststamp,
+                        "faminome",
+                        '"' . $category . '"'
+                    )
+                );
+                if ($status[0] == 'nok') {
+                    return $status;
+                }
             }
 
             $result = $ptinvoiceOps->save("StWS", $result['result'][0]);
 
-            return PTInvoiceOperations::ResponseStatus($result);
+            return PTInvoiceOperations::responseStatus($result);
         } else {
             // new product
-            $result = $ptinvoiceOps->newInstance("StWS",$params = array ('ndos' => 0));
+            $result = $ptinvoiceOps->newInstance("StWS", $params = array('ndos' => 0));
 
             $result['result'][0]['ref'] = $ref;
             $result['result'][0]['design'] = $designation;
-            $result['result'][0]['desctec'] = $shortDesc .'\n'. $longDesc;
+            $result['result'][0]['desctec'] = $shortDesc . '\n' . $longDesc;
             $result['result'][0]['obs'] = $obs;
             $result['result'][0]['codigo'] = $ean;
-            # $result['result'][0]['quantity'] = $stock;
             $result['result'][0]['epcusto'] = $cost_price;
             $result['result'][0]['epv1'] = $sell_price;
 
             $ivaStatus = self::getPhcFxIva($ptinvoiceOps, $tax);
-            if ($ivaStatus[0] == 'nok') { return $ivaStatus; }
+            if ($ivaStatus[0] == 'nok') {
+                return $ivaStatus;
+            }
 
             $result['result'][0]['tabiva'] = $ivaStatus[1];
             $result['result'][0]['taxaiva'] = $tax;
@@ -130,8 +264,8 @@ class ProductToPTInvoice extends Module
             $result['result'][0]['inactivo'] = ($active == '1' ? false : true);
             $result['result'][0]['stns'] = ($isService == '1' ? true : false);
 
-			$catResult = self::saveProductCategory($ptinvoiceOps, $category);
-			
+            $catResult = self::saveProductCategory($ptinvoiceOps, $category);
+
             if (isset($catResult) && $catResult[0] == "ok") {
                 $result['result'][0]['familia'] = $category;
                 $result['result'][0]['faminome'] = $category;
@@ -139,7 +273,7 @@ class ProductToPTInvoice extends Module
 
             $result = $ptinvoiceOps->save("StWS", $result['result'][0]);
 
-            return PTInvoiceOperations::ResponseStatus($result);
+            return PTInvoiceOperations::responseStatus($result);
         }
     }
 
@@ -153,30 +287,40 @@ class ProductToPTInvoice extends Module
         $designation = isset($product->name) ? utf8_encode(ProductToPTInvoice::stringOrArray($product->name)) : 'N/A';
         $shortName = 'N/A';
         $taxValue = $product->getIdTaxRulesGroup();
-        $tax      = isset($taxValue) ? (string)PTInvoiceConnectorGetValueByID::getTaxByRulesGroup($taxValue) : '';
+        $tax = isset($taxValue) ? (string)PTInvoiceConnectorGetValueByID::getTaxByRulesGroup($taxValue) : '';
 
         if ($tax == "") {
             // if empty set 0 tax
             $tax = "0";
         }
-        $obs        = "Produto criado via Presta PT Invoice";
-        $isService  = isset($product->is_virtual) ? $product->is_virtual : '0';
-        $stock      = (int)$product->getQuantity($product->id);
-        $active     = isset($product->active) ? $product->active : '1';
-        $shortDesc  = isset($product->description_short) ? utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description_short))) : 'N/A';
-        $longDesc   = isset($product->description) ? utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description))) : 'N/A';
-        $sell_price      = isset($product->price) ? $product->price : '0'; // preco de venda sem iva
-        $cost_price      = isset($product->wholesale_price) ? $product->wholesale_price : '0'; // preco de compra sem iva
-        $vendorRef  = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
-        $ean        = isset($product->ean13) ? $product->ean13 : '';
-        $category   = isset($product->category) ? $product->category : '';
+        $obs = "Produto criado via Presta PT Invoice";
+        $isService = isset($product->is_virtual) ?
+            $product->is_virtual : '0';
+        $stock = (int)$product->getQuantity($product->id);
+        $active = isset($product->active) ?
+            $product->active : '1';
+        $shortDesc = isset($product->description_short) ?
+            utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description_short))) : 'N/A';
+        $longDesc = isset($product->description) ?
+            utf8_encode(strip_tags(ProductToPTInvoice::stringOrArray($product->description))) : 'N/A';
+        $sell_price = isset($product->price) ?
+            $product->price : '0'; // preco de venda sem iva
+        $cost_price = isset($product->wholesale_price) ?
+            $product->wholesale_price : '0'; // preco de compra sem iva
+        $vendorRef = isset($product->supplier_name) ?
+            $product->supplier_name : 'N/A';
+        $ean = isset($product->ean13) ?
+            $product->ean13 : '';
+        $category = isset($product->category) ?
+            $product->category : '';
 
         $manufacturer = $product->getWsManufacturerName();
         if (!isset($manufacturer)) {
             $manufacturer = '';
         }
 
-        return ProductToPTInvoice::upsertProduct($ptinvoiceOps,
+        return ProductToPTInvoice::upsertProduct(
+            $ptinvoiceOps,
             $ref,
             $designation,
             $shortName,
@@ -213,7 +357,8 @@ class ProductToPTInvoice extends Module
                 $default_shop_id,
                 null
             )
-        )) {
+        )
+        ) {
             return ProductToPTInvoice::saveByProductObject($ptinvoiceOps, $product);
         }
         return null;
@@ -241,17 +386,19 @@ class ProductToPTInvoice extends Module
     {
 
         $response = $ptinvoiceOps->query("StfamiWS", array(array('column' => 'ref', 'value' => $category)));
-        $status = PTInvoiceOperations::ResponseStatus($response);
+        $status = PTInvoiceOperations::responseStatus($response);
 
-        if ($status == 'nok') { return $status; }
+        if ($status == 'nok') {
+            return $status;
+        }
 
         if (count($response['result']) == 0) {
             // new product
-            $result = $ptinvoiceOps->newInstance("StfamiWS",$params = array ('ndos' => 0));
+            $result = $ptinvoiceOps->newInstance("StfamiWS", $params = array('ndos' => 0));
             $result['result'][0]['ref'] = $category;
             $result['result'][0]['nome'] = $category;
             $result = $ptinvoiceOps->save("StfamiWS", $result['result'][0]);
-            return PTInvoiceOperations::ResponseStatus($result);
+            return PTInvoiceOperations::responseStatus($result);
         }
 
         return array('ok', '');
@@ -261,9 +408,11 @@ class ProductToPTInvoice extends Module
     {
         // product exists ?
         $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'taxa', 'value' => $value)));
-        $status = PTInvoiceOperations::ResponseStatus($response);
+        $status = PTInvoiceOperations::responseStatus($response);
 
-        if ($status[0] == 'nok') { return $status; }
+        if ($status[0] == 'nok') {
+            return $status;
+        }
 
         if (count($response['result']) != 0) {
             $ivaCode = $response['result'][0]['codigo'];
@@ -271,13 +420,13 @@ class ProductToPTInvoice extends Module
 
             $response = $ptinvoiceOps->query("IVAWS", array(array('column' => 'codigo', 'value' => $ivaCode)));
 
-			foreach($response['result'] as $item) {
-                if ($ivaDataIni < strtotime($item['dataini']) && strval($value) == strval($item['taxa'])) {
+            foreach ($response['result'] as $item) {
+                if ($ivaDataIni < strtotime($item['dataini']) && (string)$value == (string)$item['taxa']) {
                     $ivaDataIni = strtotime($item['dataini']);
                 }
             }
-			
-            foreach($response['result'] as $item) {
+
+            foreach ($response['result'] as $item) {
                 if ($ivaDataIni < strtotime($item['dataini'])) {
                     return array('nok', 'VAT value not defined');
                 }
@@ -289,6 +438,4 @@ class ProductToPTInvoice extends Module
             return array('nok', 'VAT does not exists in PHCFX');
         }
     }
-
-
 }

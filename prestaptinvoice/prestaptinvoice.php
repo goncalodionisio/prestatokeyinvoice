@@ -8,11 +8,10 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Majoinfa - Sociedade Unipessoal Lda
- *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
- *  @license   LICENSE.txt
-*/
-
+ * @author    Majoinfa - Sociedade Unipessoal Lda
+ * @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
+ * @license   LICENSE.txt
+ */
 
 require 'classes/PTInvoiceConfigsValidation.php';
 require 'classes/GetValueByID.php';
@@ -49,11 +48,12 @@ class PrestaPTInvoice extends Module
         }
 
         if (!$this->registerHook('displayAdminOrder') ||
-        !$this->registerHook('actionProductSave') ||
-        !$this->registerHook('orderConfirmation') ||
-        !$this->registerHook('actionObjectAddressUpdateAfter') ||
-        !$this->registerHook('actionObjectAddressAddAfter') ||
-        !$this->registerHook('displayAdminCustomers')) {
+            !$this->registerHook('actionProductSave') ||
+            !$this->registerHook('orderConfirmation') ||
+            !$this->registerHook('actionObjectAddressUpdateAfter') ||
+            !$this->registerHook('actionObjectAddressAddAfter') ||
+            !$this->registerHook('displayAdminCustomers')
+        ) {
             return false;
         }
         // All went well!
@@ -133,30 +133,31 @@ class PrestaPTInvoice extends Module
             PTInvoiceConfigsValidation::setDocTypeInv(Tools::getValue('PTInvoice_INV_DOC_TYPE'));
             // configure doc reference for shipping cost
             PTInvoiceConfigsValidation::setShippingCostProduct(Tools::getValue('PTInvoice_SHIPPINGCOST'));
-            
+
             // check key
             if (!$appID = Tools::getValue('appID')) {
-                
+
                 $this->context->smarty->assign('appID', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
                 return false;
             }
-            
+
             PTInvoiceConfigsValidation::setkiapi(Tools::getValue('appID'));
             $this->context->smarty->assign('confirmation_appID', 'ok');
 
             PTInvoiceConfigsValidation::setusername(Tools::getValue('username'));
             $this->context->smarty->assign('confirmation_username', 'ok');
 
-             PTInvoiceConfigsValidation::setpassword(Tools::getValue('password'));
+            PTInvoiceConfigsValidation::setpassword(Tools::getValue('password'));
             $this->context->smarty->assign('confirmation_password', 'ok');
 
-            PTInvoiceConfigsValidation::setconfig_url(Tools::getValue('config_url'));
+            PTInvoiceConfigsValidation::setconfigurl(Tools::getValue('config_url'));
             $this->context->smarty->assign('confirmation_config_url', 'ok');
 
             PTInvoiceConfigsValidation::setcompany(Tools::getValue('ptinvoice_company'));
             $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
         }
+        return true;
     }
 
     /**
@@ -190,10 +191,10 @@ class PrestaPTInvoice extends Module
         // enable/disable orders syncronization with PTInvoice
         $enable_orders_sync = Configuration::get('PTInvoice_ORDERS_SYNC');
         $this->context->smarty->assign('enable_orders_sync', $enable_orders_sync);
-        
+
         $PTInvoice_SHIPPINGCOST = Configuration::get('PTInvoice_SHIPPINGCOST');
         $this->context->smarty->assign('PTInvoice_SHIPPINGCOST', $PTInvoice_SHIPPINGCOST);
-        
+
         // doctype drop box
         $this->assignDocTypeShip();
         $this->assignDocTypeInv();
@@ -238,7 +239,7 @@ class PrestaPTInvoice extends Module
             }
 
             if ($result[0] == "nok") {
-                $this->context->controller->errors[] =utf8_decode($result[1]);
+                $this->context->controller->errors[] = utf8_decode($result[1]);
             }
         }
 
@@ -262,7 +263,7 @@ class PrestaPTInvoice extends Module
 
             if (isset($location) && $location == 'adminaddresses') {
                 if (isset($result) && $result[0] != 'ok') {
-                    $this->context->controller->errors[] =utf8_decode($result[1]);
+                    $this->context->controller->errors[] = utf8_decode($result[1]);
                 }
             }
         }
@@ -304,7 +305,7 @@ class PrestaPTInvoice extends Module
             if (isset($result)) {
 
                 if ($result[0] != 'ok') {
-                    $this->context->controller->errors[] =utf8_decode($result[1]);
+                    $this->context->controller->errors[] = utf8_decode($result[1]);
                 } else {
                     $this->context->smarty->assign('send_to_pt_invoice_confirmation', "ok");
                 }
@@ -326,11 +327,12 @@ class PrestaPTInvoice extends Module
                         $addr1 = utf8_encode($addr['address1']);
                         $addr2 = utf8_encode($addr['address2']);
 
-                        if (($address[0]['morada'].$address[0]['morada2']) == ($addr1.$addr2)) {
+                        if (($address[0]['morada'] . $address[0]['morada2']) == ($addr1 . $addr2)) {
                             $selected_address = $addr['id_address'];
                         }
                     }
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                }
             }
 
             $this->context->smarty->assign('selected_address', $selected_address);
@@ -358,8 +360,7 @@ class PrestaPTInvoice extends Module
         // doctype drop box
         $this->assignDocTypeShip();
         //$this->assignDocTypeInv();
-        if (Tools::isSubmit('process_sync_order'))
-        {
+        if (Tools::isSubmit('process_sync_order')) {
 
             $from = 'hookDisplayAdminOrder';
 
@@ -368,18 +369,16 @@ class PrestaPTInvoice extends Module
             $from = 'hookOrderConfirmation';
         }
 
-        if (
-            Tools::isSubmit('process_sync_order') ||
-            PTInvoiceConfigsValidation::syncOrders()
+        if (Tools::isSubmit('process_sync_order')
+            || PTInvoiceConfigsValidation::syncOrders()
         ) {
 
             $result = OrderToPTInvoice::sendOrderToPTInvoice($id_order, $from);
 
             if ($result[0] == "nok") {
 
-                $this->context->controller->errors[] =utf8_decode($result[1]);
-            }
-            else {
+                $this->context->controller->errors[] = utf8_decode($result[1]);
+            } else {
 
                 $this->context->smarty->assign('confirmation_ok', $result);
             }
@@ -387,7 +386,7 @@ class PrestaPTInvoice extends Module
 
         return $this->display(__FILE__, 'displayAdminOrder.tpl');
     }
-    
+
     // frontend
     /**
      * @return bool
@@ -407,11 +406,10 @@ class PrestaPTInvoice extends Module
 
         $id_order = (int)Tools::getValue('id_order');
         OrderToPTInvoice::sendOrderToPTInvoice($id_order, 'hookOrderConfirmation');
-        
+
         /*
         * TODO: notificar admin de orders nao sincronizadas via frontend
         */
+        return true;
     }
-
-
 }

@@ -12,4 +12,4 @@
  *  @license   LICENSE.txt
  */
  
- DROP TABLE `PREFIX_prestaptinvoice_response`;
+ DROP TABLE IF EXISTS `PREFIX_prestaptinvoice_response`;
