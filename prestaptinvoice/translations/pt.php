@@ -13,10 +13,14 @@ $_MODULE['<{prestaptinvoice}prestashop>displayadminproductsextra_a3ed1ac957c5b33
 $_MODULE['<{prestaptinvoice}prestashop>displayadminproductsextra_016e3960e1c210d1522c879806742d0d'] = 'Integração de produtos no KeyInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>displayadminproductsextra_56998f876ce39162431cd04746378c41'] = 'Criar / Atualizar produto no KeyInvoice';
 $_MODULE['<{prestaptinvoice}prestashop>getcontent_c888438d14855d7d96a2724ee9c306bd'] = 'Configurações gravadas.';
-$_MODULE['<{prestaptinvoice}prestashop>getcontent_207858d0c716e543a8e3c2fa08fc6e4f'] = 'Chave não reconhecida.';
-$_MODULE['<{prestaptinvoice}prestashop>getcontent_365ecbbd8fe215d85af318e73072d1a8'] = 'A API Key não foi definida.';
-$_MODULE['<{prestaptinvoice}prestashop>getcontent_a3ed1ac957c5b3334cecd87c0aaafd63'] = 'Não foi possível contactar o KeyInvoice. Tente mais tarde.';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_7c0f33ee00277f4130e9ed012cbe8adf'] = 'Não introduziu um URL no formulário!';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_bd763c383c95dc9596831e52a64e4aa1'] = 'Não introduziu um username no formulário!';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_29c5ce37096291e747f7441014e33cfb'] = 'Não introduziu um username no formulário!';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_b8090bc55825ec405cc932f253e3f65c'] = 'Não introduziu a appID no formulário!';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_bdf337f3f5d506055e4279dc6053c86d'] = 'Não introduziu uma Company no formulário!';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_18ccd1fb00e022d18a0d2332920c76f3'] = 'Dados inválidos, por favor verifique as suas credenciais!';
 $_MODULE['<{prestaptinvoice}prestashop>getcontent_254f642527b45bc260048e30704edb39'] = 'Configuração';
+$_MODULE['<{prestaptinvoice}prestashop>getcontent_98512423f7ba241466bdf8b19ad27640'] = 'Estado da configuração';
 $_MODULE['<{prestaptinvoice}prestashop>getcontent_6a26f548831e6a8c26bfbbd9f6ec61e0'] = 'Ajuda';
 $_MODULE['<{prestaptinvoice}prestashop>getcontent_faa73b0795f58baf7e2d8a0df2ee1585'] = 'Credênciais PHCFX';
 $_MODULE['<{prestaptinvoice}prestashop>getcontent_068f80c7519d0528fb08e82137a72131'] = 'Produtos';

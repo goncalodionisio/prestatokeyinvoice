@@ -15,13 +15,18 @@
 *}
 {if isset($confirmation_key)}
     <div class="alert alert-success">{l s='Settings updated' mod='prestaptinvoice'}</div>
-{elseif isset($no_confirmation_key)}
-    <div class="alert alert-danger">{l s='Key not recognized!' mod='prestaptinvoice'}</div>
+{elseif isset($no_config_url)}
+    <div class="alert alert-info">{l s='No Url entered' mod='prestaptinvoice'}</div>
+{elseif isset($no_username)}
+    <div class="alert alert-info">{l s='No username entered' mod='prestaptinvoice'}</div>
+{elseif isset($no_password)}
+    <div class="alert alert-info">{l s='No password entered' mod='prestaptinvoice'}</div>
 {elseif isset($no_configuration_key)}
-    <div class="alert alert-info">{l s='No API key set yet' mod='prestaptinvoice'}</div>
-{/if}
-{if isset($no_soap)}
-    <div class="alert alert-danger">{l s='There was no comunication with Webservice! Try again later!' mod='prestaptinvoice'}</div>
+    <div class="alert alert-info">{l s='No appID entered' mod='prestaptinvoice'}</div>
+{elseif isset($no_ptinvoice_company)}
+    <div class="alert alert-info">{l s='No Company entered' mod='prestaptinvoice'}</div>
+{elseif isset($no_confirmation_key)}
+    <div class="alert alert-danger">{l s='Data not recognized! Please check your credentials' mod='prestaptinvoice'}</div>
 {/if}
 
 <div class="panel">
@@ -35,6 +40,14 @@
             <div class="col-lg-6">
                 <fieldset>
                     <legend>Session Config:</legend>
+                        {l s='Configurations status' mod='prestaptinvoice'}
+                        {if empty($password) and empty($no_confirmation_key) }
+                            <img src="../img/admin/status_orange.png" alt="" />
+                        {elseif isset($no_confirmation_key)}
+                            <img src="../img/admin/status_red.png" alt="" />
+                        {else}
+                            <img src="../img/admin/status_green.png" alt="" />
+                        {/if}
                     <div class="form-group clearfix">
                         <div class="col-lg-12">
                             <label for="config_url">url:</label>
@@ -175,8 +188,8 @@
                 </fieldset>
             </div>
         </div>
-        <div class="form-group clearfix">
-            <div class="submit col-lg-12">
+        <div class="form-group clearfix paginated-right">
+            <div class="submit col-lg-push-11 col-lg-1 col-md-push-10 col-md-2 col-sm-push-10 col-sm-2 col-xs-push-8 col-xs-2">
                 <button type="submit" name="ptinvc_save_form" class="button btn btn-default button-medium"><span>{l s='Save' mod='prestaptinvoice'} <i class="icon-chevron-right right"></i></span></button>
             </div>
         </div>

@@ -32,7 +32,7 @@ class PrestaPTInvoice extends Module
         $this->version = '1.0.0';
         $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
-		$this->module_key = 'c7d055713b0edeb5943ca84cfd88ab32';
+        $this->module_key = 'c7d055713b0edeb5943ca84cfd88ab32';
         parent::__construct();
         $this->displayName = $this->l('Presta PT Invoice');
         $this->description = $this->l('Provides integration with Portuguese Authorized Billing Solution');
@@ -123,6 +123,7 @@ class PrestaPTInvoice extends Module
     public function processConfiguration()
     {
         if (Tools::isSubmit('ptinvc_save_form')) {
+
             // enable/disable products syncronization with PTInvoice
             PTInvoiceConfigsValidation::setSyncProducts(Tools::getValue('enable_products_sync'));
             // enable/disable clients syncronization with PTInvoice
@@ -135,28 +136,87 @@ class PrestaPTInvoice extends Module
             // configure doc reference for shipping cost
             PTInvoiceConfigsValidation::setShippingCostProduct(Tools::getValue('PTInvoice_SHIPPINGCOST'));
 
-            // check key
-            if (!$appID = Tools::getValue('appID')) {
+            if (empty(Tools::getValue('config_url'))) {
 
-                $this->context->smarty->assign('appID', 'na');
+                $this->context->smarty->assign('no_config_url', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
                 return false;
+
+            } else {
+
+                PTInvoiceConfigsValidation::setconfigurl(Tools::getValue('config_url'));
+                $this->context->smarty->assign('confirmation_config_url', 'ok');
+
             }
 
-            PTInvoiceConfigsValidation::setkiapi(Tools::getValue('appID'));
-            $this->context->smarty->assign('confirmation_appID', 'ok');
+            if (empty(Tools::getValue('username'))) {
 
-            PTInvoiceConfigsValidation::setusername(Tools::getValue('username'));
-            $this->context->smarty->assign('confirmation_username', 'ok');
+                $this->context->smarty->assign('no_username', 'na');
+                PTInvoiceConfigsValidation::deleteByName();
+                return false;
 
-            PTInvoiceConfigsValidation::setpassword(Tools::getValue('password'));
-            $this->context->smarty->assign('confirmation_password', 'ok');
+            } else {
 
-            PTInvoiceConfigsValidation::setconfigurl(Tools::getValue('config_url'));
-            $this->context->smarty->assign('confirmation_config_url', 'ok');
+                PTInvoiceConfigsValidation::setusername(Tools::getValue('username'));
+                $this->context->smarty->assign('confirmation_username', 'ok');
 
-            PTInvoiceConfigsValidation::setcompany(Tools::getValue('ptinvoice_company'));
-            $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
+            }
+
+
+            if (empty(Tools::getValue('password'))) {
+
+                $this->context->smarty->assign('no_password', 'na');
+                PTInvoiceConfigsValidation::deleteByName();
+                return false;
+
+            } else {
+
+                PTInvoiceConfigsValidation::setpassword(Tools::getValue('password'));
+                $this->context->smarty->assign('confirmation_password', 'ok');
+
+            }
+
+
+            if (empty(Tools::getValue('appID'))) {
+
+                $this->context->smarty->assign('no_configuration_key', 'na');
+                PTInvoiceConfigsValidation::deleteByName();
+                return false;
+
+            } else {
+
+                PTInvoiceConfigsValidation::setkiapi(Tools::getValue('appID'));
+                $this->context->smarty->assign('confirmation_appID', 'ok');
+
+            }
+
+            if (empty(Tools::getValue('ptinvoice_company'))) {
+
+                $this->context->smarty->assign('no_ptinvoice_company', 'na');
+                PTInvoiceConfigsValidation::deleteByName();
+                return false;
+
+            } else {
+
+                PTInvoiceConfigsValidation::setcompany(Tools::getValue('ptinvoice_company'));
+                $this->context->smarty->assign('confirmation_ptinvoice_company', 'ok');
+
+            }
+
+            $ptinvoiceOps = new PTInvoiceOperations();
+            $response = $ptinvoiceOps->login();
+
+            if ($response[0] == "nok") {
+
+                $this->context->smarty->assign('no_confirmation_key', 'nok');
+                PTInvoiceConfigsValidation::deleteByName();
+                return false;
+
+            } else {
+
+                $this->context->smarty->assign('confirmation_key', 'ok');
+            }
+
         }
         return true;
     }
@@ -166,6 +226,7 @@ class PrestaPTInvoice extends Module
      */
     public function assignConfiguration()
     {
+
         $config_url = Configuration::get('PTInvoice_CONFIG_URL');
         $this->context->smarty->assign('config_url', $config_url);
 
