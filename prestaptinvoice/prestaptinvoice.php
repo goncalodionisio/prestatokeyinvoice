@@ -136,7 +136,9 @@ class PrestaPTInvoice extends Module
             // configure doc reference for shipping cost
             PTInvoiceConfigsValidation::setShippingCostProduct(Tools::getValue('PTInvoice_SHIPPINGCOST'));
 
-            if (empty(Tools::getValue('config_url'))) {
+
+            $check = Tools::getValue('config_url');
+            if (empty($check)) {
 
                 $this->context->smarty->assign('no_config_url', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
@@ -148,7 +150,8 @@ class PrestaPTInvoice extends Module
 
             }
 
-            if (empty(Tools::getValue('username'))) {
+            $check = Tools::getValue('username');
+            if (empty($check)) {
 
                 $this->context->smarty->assign('no_username', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
@@ -160,8 +163,8 @@ class PrestaPTInvoice extends Module
 
             }
 
-
-            if (empty(Tools::getValue('password'))) {
+            $check = Tools::getValue('password');
+            if (empty($check)) {
 
                 $this->context->smarty->assign('no_password', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
@@ -173,8 +176,8 @@ class PrestaPTInvoice extends Module
 
             }
 
-
-            if (empty(Tools::getValue('appID'))) {
+            $check = Tools::getValue('appID');
+            if (empty($check)) {
 
                 $this->context->smarty->assign('no_configuration_key', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
@@ -186,7 +189,8 @@ class PrestaPTInvoice extends Module
 
             }
 
-            if (empty(Tools::getValue('ptinvoice_company'))) {
+            $check = Tools::getValue('ptinvoice_company');
+            if (empty($check)) {
 
                 $this->context->smarty->assign('no_ptinvoice_company', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
