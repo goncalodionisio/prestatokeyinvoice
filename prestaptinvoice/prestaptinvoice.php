@@ -140,7 +140,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_config_url', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
@@ -153,7 +152,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_username', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
@@ -167,7 +165,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_password', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
@@ -181,7 +178,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_configuration_key', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
@@ -194,7 +190,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_ptinvoice_company', 'na');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
@@ -210,7 +205,6 @@ class PrestaPTInvoice extends Module
 
                 $this->context->smarty->assign('no_confirmation_key', 'nok');
                 PTInvoiceConfigsValidation::deleteByName();
-                return false;
 
             } else {
 
