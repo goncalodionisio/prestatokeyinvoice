@@ -27,6 +27,9 @@
     <div class="alert alert-info">{l s='No Company entered' mod='prestaptinvoice'}</div>
 {elseif isset($no_confirmation_key)}
     <div class="alert alert-danger">{l s='Data not recognized! Please check your credentials' mod='prestaptinvoice'}</div>
+    <script>
+        setTimeout(function(){ document.getElementById("loginContent").reset(); },250);
+    </script>	
 {/if}
 
 <div class="panel">
@@ -35,7 +38,7 @@
             {l s='Configuration' mod='prestaptinvoice'}
         </legend>
     </div>
-    <form action="" method="post">
+    <form action="" method="post" id="loginContent">
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
