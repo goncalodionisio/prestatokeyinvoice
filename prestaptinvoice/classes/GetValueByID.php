@@ -47,7 +47,7 @@ class PTInvoiceConnectorGetValueByID extends Module
         $country = Configuration::get('PS_COUNTRY_DEFAULT');
         $id_tax = DB::getInstance()->getValue(
             "SELECT id_tax FROM " . _DB_PREFIX_ . "tax_rule where 
-            id_tax_rules_group = " . $id . " and id_country = " . $country
+            id_tax_rules_group = " . (int)$id . " and id_country = " . $country
         );
 
         return PTInvoiceConnectorGetValueByID::getTaxByID($id_tax);
