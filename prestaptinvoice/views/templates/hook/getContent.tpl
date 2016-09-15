@@ -86,44 +86,64 @@
                 </fieldset>
             </div>
         </div>
+
+
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
-                <legend>{l s='Products' mod='prestaptinvoice'}:</legend>
+                    <legend>{l s='Products' mod='prestaptinvoice'}:</legend>
                     <div class="form-group clearfix">
-                        <label class="col-lg-10" for="">{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        <div class="col-lg-9">
+                            <label for="">{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        </div>
 
-                        <img src="../img/admin/enabled.gif" alt="" />
-                        <input type="radio" id="'enable_products_sync_1" name="enable_products_sync" value="1" {if $enable_products_sync eq 1}checked{/if}>
-                        <label for="'enable_products_sync_1" class="t">{l s='Yes' mod='prestaptinvoice'}</label>
+                        <div class="col-lg-2">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_products_sync_1" name="enable_products_sync" value="1" type="radio" {if $enable_products_sync eq 1}checked{/if}>
+                                <label for="'enable_products_sync_1" class="radioCheck">
+                                    {l s='Yes' mod='prestaptinvoice'}
+                                </label>
+                                <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_products_sync_0" name="enable_products_sync" value="0" type="radio" {if empty($enable_products_sync) || $enable_products_sync eq 0}checked{/if}>
+                                <label for="'enable_products_sync_0" class="radioCheck">
+                                    {l s='No' mod='prestaptinvoice'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
 
-                        <img src="../img/admin/disabled.gif" alt="" />
-                        <input type="radio" id="'enable_products_sync_0" name="enable_products_sync" value="0" {if empty($enable_products_sync) || $enable_products_sync eq 0}checked{/if}>
-                        <label for="'enable_products_sync_0" class="t">{l s='No' mod='prestaptinvoice'}</label>
                     </div>
                 </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
-                <legend>&nbsp;</legend>
+                    <legend>&nbsp;</legend>
                     <p class="text-justify">- {l s='Enable product integration and everytime you save your product it will be created in KeyInvoice.' mod='prestaptinvoice'}</p>
                 </fieldset>
             </div>
         </div>
+
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
                 <legend>{l s='Customers' mod='prestaptinvoice'}:</legend>
                     <div class="form-group clearfix">
-                        <label class="col-lg-10" for="">{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        <div class="col-lg-9">
+                            <label for="">{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        </div>
 
-                        <img src="../img/admin/enabled.gif" alt="" />
-                        <input type="radio" id="'enable_clients_sync_1" name="enable_clients_sync" value="1" {if $enable_clients_sync eq 1}checked{/if}>
-                        <label for="'enable_clients_sync_1" class="t">{l s='Yes' mod='prestaptinvoice'}</label>
-    
-                        <img src="../img/admin/disabled.gif" alt="" />
-                        <input type="radio" id="'enable_clients_sync_0" name="enable_clients_sync" value="0" {if empty($enable_clients_sync) || $enable_clients_sync eq 0}checked{/if}>
-                        <label for="'enable_clients_sync_0" class="t">{l s='No' mod='prestaptinvoice'}</label>
+                        <div class="col-lg-2">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_clients_sync_1" name="enable_clients_sync" value="1" type="radio" {if $enable_clients_sync eq 1}checked{/if}>
+                                <label for="'enable_clients_sync_1" class="radioCheck">
+                                    {l s='Yes' mod='prestaptinvoice'}
+                                </label>
+                                <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_clients_sync_0" name="enable_clients_sync" value="0" type="radio" {if empty($enable_clients_sync) || $enable_clients_sync eq 0}checked{/if}>
+                                <label for="'enable_clients_sync_0" class="radioCheck">
+                                    {l s='No' mod='prestaptinvoice'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
                     </div>
                 </fieldset>
             </div>
@@ -134,21 +154,33 @@
                 </fieldset>
             </div>
         </div>
+
+
+
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
                 <legend>{l s='Orders' mod='prestaptinvoice'}:</legend>
                     <div class="form-group clearfix">
-                        <label class="col-lg-10" for="" >{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        <div class="col-lg-9">
+                            <label for="">{l s='Enable/disable syncronization' mod='prestaptinvoice'}:</label>
+                        </div>
 
-                        <img src="../img/admin/enabled.gif" alt="" />
-                        <input type="radio" id="'enable_orders_sync_1" name="enable_orders_sync" value="1" {if $enable_orders_sync eq 1}checked{/if}>
-                        <label for="'enable_orders_sync_1" class="t">{l s='Yes' mod='prestaptinvoice'}</label>
-    
-                        <img src="../img/admin/disabled.gif" alt="" />
-                        <input type="radio" id="'enable_orders_sync_0" name="enable_orders_sync" value="0" {if empty($enable_orders_sync) || $enable_orders_sync eq 0}checked{/if}>
-                        <label for="'enable_orders_sync_0" class="t">{l s='No' mod='prestaptinvoice'}</label>
+                        <div class="col-lg-2">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_orders_sync_1" name="enable_orders_sync" value="1" type="radio" {if $enable_orders_sync eq 1}checked{/if}>
+                                <label for="'enable_orders_sync_1" class="radioCheck">
+                                    {l s='Yes' mod='prestaptinvoice'}
+                                </label>
+                                <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_orders_sync_0" name="enable_orders_sync" value="0" type="radio" {if empty($enable_orders_sync) || $enable_orders_sync eq 0}checked{/if}>
+                                <label for="'enable_orders_sync_0" class="radioCheck">
+                                    {l s='No' mod='prestaptinvoice'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
                     </div>
+
                     <div class="form-group clearfix">
                         <label for="">{l s='Default Document Type' mod='prestaptinvoice'}:</label>
                         {if $enable_orders_sync eq 1}
@@ -158,16 +190,6 @@
                             <input type="hidden" id="PTInvoice_SHIP_DOC_TYPE_hidden" name="PTInvoice_SHIP_DOC_TYPE" value="{1|escape:'htmlall':'UTF-8'}" />
                         {/if}
                     </div>
-                    {*
-                    <div class="form-group clearfix">
-                        <label for="">{l s='Default Document Type' mod='prestaptinvoice'}:</label>
-                        {if $enable_orders_sync eq 1}
-                            {html_options name=PTInvoice_INV_DOC_TYPE options=$InvdocOptions selected=$InvdefaultSelect}
-                         {else}   
-                            {html_options name=PTInvoice_INV_DOC_TYPE disabled="disabled" options=$InvdocOptions selected=$InvdefaultSelect}
-                         {/if}
-                    </div>
-                    *}
                 </fieldset>
             </div>
             <div class="col-lg-6">
@@ -196,7 +218,7 @@
         </div>
         <div class="form-group clearfix paginated-right">
             <div class="submit col-lg-push-11 col-lg-1 col-md-push-10 col-md-2 col-sm-push-10 col-sm-2 col-xs-push-8 col-xs-2">
-                <button type="submit" name="ptinvc_save_form" class="button btn btn-action btn-default button-medium"><i class="icon-save"></i><span> {l s='Save' mod='prestaptinvoice'}</span></button>
+                <button type="submit" name="ptinvc_save_form" class="btn btn-default pull-right"><i class="process-icon-save"></i><span> {l s='Save' mod='prestaptinvoice'}</span></button>
             </div>
         </div>
     </form>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>prestaptinvoice</name>
+	<displayName><![CDATA[Presta PT Invoice]]></displayName>
+	<version><![CDATA[1.0.0]]></version>
+	<description><![CDATA[Realiza integra&ccedil;&atilde;o com sistema fatura&ccedil;&atilde;o certificado Portugu&ecirc;s ]]></description>
+	<author><![CDATA[Majoinfa, Lda]]></author>
+	<tab><![CDATA[billing_invoicing]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>
