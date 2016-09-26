@@ -147,14 +147,17 @@ class OrderToKeyInvoice extends Module
             //$getDocTypeInv  = Tools::getValue('KEYINVOICECONNECTOR_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
             $address_delivery = new AddressCore($order->id_address_delivery);
+            $vat_number = isset($address_invoice->vat_number) ? $address_invoice->vat_number : '' ;
 
-            // upsert customer
-            $result = ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
-            if (isset($result) && $result[0] != '1') {
-                return $result;
+            if ($vat_number) {
+
+                // upsert customer
+                $result = ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
+                if (isset($result) && $result[0] != '1') {
+                    return $result;
+                }
             }
 
-            $vat_number = isset($address_invoice->vat_number) ? $address_invoice->vat_number : '' ;
             $order_reference = isset($order->reference) ? $order->reference : 'N/A' ;
 
             // create document
