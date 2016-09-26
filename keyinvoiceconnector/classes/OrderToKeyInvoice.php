@@ -149,7 +149,7 @@ class OrderToKeyInvoice extends Module
             $address_delivery = new AddressCore($order->id_address_delivery);
             $vat_number = isset($address_invoice->vat_number) ? $address_invoice->vat_number : '' ;
 
-            if ($vat_number) {
+            if (!empty($vat_number)) {
 
                 // upsert customer
                 $result = ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
