@@ -12,4 +12,4 @@
  *  @license   LICENSE.txt
  */
  
- DROP TABLE `PREFIX_keyinvoiceconnector_response`;
+ DROP TABLE IF EXISTS `PREFIX_keyinvoiceconnector_response`;
