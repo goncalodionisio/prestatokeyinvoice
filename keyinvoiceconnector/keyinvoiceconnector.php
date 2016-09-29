@@ -31,6 +31,7 @@ class KeyInvoiceConnector extends Module
         parent::__construct();
         $this->displayName = $this->l('KeyInvoice Connector');
         $this->description = $this->l('Provides integration with Portuguese KeyInvoice billing system');
+        $this->module_key = 'ab4288da7b5c850b5049834158100496';
     }
 
     public function install()
