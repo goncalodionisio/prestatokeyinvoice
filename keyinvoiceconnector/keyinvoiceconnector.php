@@ -25,7 +25,7 @@ class KeyInvoiceConnector extends Module
     {
         $this->name = 'keyinvoiceconnector';
         $this->tab = 'billing_invoicing';
-        $this->version = '1.0.0';
+        $this->version = '1.0.0.1';
         $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
         parent::__construct();
