@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
 	<name>prestaptinvoice</name>
-	<displayName><![CDATA[Presta PT Invoice]]></displayName>
+	<displayName><![CDATA[Certified Invoice Generator for Portugal]]></displayName>
 	<version><![CDATA[1.0.0]]></version>
 	<description><![CDATA[Provides integration with Portuguese Authorized Billing Solution]]></description>
 	<author><![CDATA[Majoinfa, Lda]]></author>
