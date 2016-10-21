@@ -34,7 +34,7 @@ class PrestaPTInvoice extends Module
         $this->bootstrap = true;
         $this->module_key = 'c7d055713b0edeb5943ca84cfd88ab32';
         parent::__construct();
-        $this->displayName = $this->l('Presta PT Invoice');
+        $this->displayName = $this->l('Certified Invoice Generator for Portugal');
         $this->description = $this->l('Provides integration with Portuguese Authorized Billing Solution');
     }
 
