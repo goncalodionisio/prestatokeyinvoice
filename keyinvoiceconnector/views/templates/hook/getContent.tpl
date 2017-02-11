@@ -49,8 +49,8 @@
                             {/if}
                         </div>
                     </div>
-                </fielset>
-            </div>        
+                </fieldset>
+            </div>
             <div class="col-lg-6">
                 <fieldset>
                 <legend class="text-center">{l s='Help' mod='keyinvoiceconnector'}:</legend>
@@ -61,41 +61,119 @@
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
-                <legend>{l s='Products' mod='keyinvoiceconnector'}:</legend>
+                <legend>{l s='Debug' mod='keyinvoiceconnector'}:</legend>
                     <div class="form-group clearfix">
-                        <label for="">{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
-                            <img src="../img/admin/enabled.gif" alt="" />
-                            <input type="radio" id="'enable_products_sync_1" name="enable_products_sync" value="1" {if $enable_products_sync eq 1}checked{/if}>
-                            <label for="'enable_products_sync_1" class="t">{l s='Yes' mod='keyinvoiceconnector'}</label>
-        
-                            <img src="../img/admin/disabled.gif" alt="" />
-                            <input type="radio" id="'enable_products_sync_0" name="enable_products_sync" value="0" {if empty($enable_products_sync) || $enable_products_sync eq 0}checked{/if}>
-                            <label for="'enable_products_sync_0" class="t">{l s='No' mod='keyinvoiceconnector'}</label>
+                        <div class="col-lg-8">
+                            <label for="">{l s='Enable/disable debug' mod='keyinvoiceconnector'}:</label>
+                        </div>
+                        <div class="col-lg-4">
+                                <span class="switch prestashop-switch fixed-width-lg">
+                                    <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_keyinvoice_debug_1" name="enable_keyinvoice_debug" value="1" type="radio" {if $enable_keyinvoice_debug eq 1}checked{/if}>
+                                    <label for="'enable_keyinvoice_debug_1" class="radioCheck">
+                                        {l s='Yes' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_keyinvoice_debug_0" name="enable_keyinvoice_debug" value="0" type="radio" {if empty($enable_keyinvoice_debug) || $enable_keyinvoice_debug eq 0}checked{/if}>
+                                    <label for="'enable_keyinvoice_debug_0" class="radioCheck">
+                                        {l s='No' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <a class="slide-button btn"></a>
+                                </span>
+                        </div>
                     </div>
-                </fielset>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
                 <legend>&nbsp;</legend>
-                    <p class="text-justify">- {l s='Enable product integration and everytime you save your product it will be created in KeyInvoice.' mod='keyinvoiceconnector'}</p>
+                    <p class="text-justify">- {l s='Enable debug for module.' mod='keyinvoiceconnector'}</p>
                 </fieldset>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
-                <legend>{l s='Customers' mod='keyinvoiceconnector'}:</legend>
+                    <legend>{l s='Products' mod='keyinvoiceconnector'}:</legend>
                     <div class="form-group clearfix">
-                        <label for="">{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
-                        <img src="../img/admin/enabled.gif" alt="" />
-                        <input type="radio" id="'enable_clients_sync_1" name="enable_clients_sync" value="1" {if $enable_clients_sync eq 1}checked{/if}>
-                        <label for="'enable_clients_sync_1" class="t">{l s='Yes' mod='keyinvoiceconnector'}</label>
-    
-                        <img src="../img/admin/disabled.gif" alt="" />
-                        <input type="radio" id="'enable_clients_sync_0" name="enable_clients_sync" value="0" {if empty($enable_clients_sync) || $enable_clients_sync eq 0}checked{/if}>
-                        <label for="'enable_clients_sync_0" class="t">{l s='No' mod='keyinvoiceconnector'}</label>
+                        <div class="col-lg-8">
+                            <label for="">{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
+                        </div>
+                        <div class="col-lg-4">
+                                <span class="switch prestashop-switch fixed-width-lg">
+                                    <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_products_sync_1" name="enable_products_sync" value="1" type="radio" {if $enable_products_sync eq 1}checked{/if}>
+                                    <label for="'enable_products_sync_1" class="radioCheck">
+                                        {l s='Yes' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_products_sync_0" name="enable_products_sync" value="0" type="radio" {if empty($enable_products_sync) || $enable_products_sync eq 0}checked{/if}>
+                                    <label for="'enable_products_sync_0" class="radioCheck">
+                                        {l s='No' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <a class="slide-button btn"></a>
+                                </span>
+                        </div>
                     </div>
-                </fielset>
+                </fieldset>
+            </div>
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>&nbsp;</legend>
+                    <p class="text-justify">- {l s='Enable product integration and everytime you save your product it will be created/updated in KeyInvoice.' mod='keyinvoiceconnector'}</p>
+                </fieldset>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>&nbsp;</legend>
+                    <div class="form-group clearfix">
+                        <div class="col-lg-8">
+                            <label for="">{l s='Keyinvoice Master Produtcts' mod='keyinvoiceconnector'}:</label>
+                        </div>
+                        <div class="col-lg-4">
+                                <span class="switch prestashop-switch fixed-width-lg">
+                                    <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'keyinvoice_master_products_1" name="keyinvoice_master_products" value="1" type="radio" {if $keyinvoice_master_products eq 1}checked{/if}>
+                                    <label for="'keyinvoice_master_products_1" class="radioCheck">
+                                        {l s='Yes' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'keyinvoice_master_products_0" name="keyinvoice_master_products" value="0" type="radio" {if empty($keyinvoice_master_products) || $keyinvoice_master_products eq 0}checked{/if}>
+                                    <label for="'keyinvoice_master_products_0" class="radioCheck">
+                                        {l s='No' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <a class="slide-button btn"></a>
+                                </span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>&nbsp;</legend>
+                    <p class="text-justify">- {l s='If enabled products only will be created, not updated.' mod='keyinvoiceconnector'}</p>
+                </fieldset>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>{l s='Customers' mod='keyinvoiceconnector'}:</legend>
+                    <div class="form-group clearfix">
+                        <div class="col-lg-8">
+                            <label for="">{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
+                        </div>
+                        <div class="col-lg-4">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_clients_sync_1" name="enable_clients_sync" value="1" type="radio" {if $enable_clients_sync eq 1}checked{/if}>
+                                <label for="'enable_clients_sync_1" class="radioCheck">
+                                    {l s='Yes' mod='keyinvoiceconnector'}
+                                </label>
+                                <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_clients_sync_0" name="enable_clients_sync" value="0" type="radio" {if empty($enable_clients_sync) || $enable_clients_sync eq 0}checked{/if}>
+                                <label for="'enable_clients_sync_0" class="radioCheck">
+                                    {l s='No' mod='keyinvoiceconnector'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
@@ -107,16 +185,26 @@
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
+
                 <legend>{l s='Orders' mod='keyinvoiceconnector'}:</legend>
                     <div class="form-group clearfix">
-                        <label for="" >{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
-                        <img src="../img/admin/enabled.gif" alt="" />
-                        <input type="radio" id="'enable_orders_sync_1" name="enable_orders_sync" value="1" {if $enable_orders_sync eq 1}checked{/if}>
-                        <label for="'enable_orders_sync_1" class="t">{l s='Yes' mod='keyinvoiceconnector'}</label>
-    
-                        <img src="../img/admin/disabled.gif" alt="" />
-                        <input type="radio" id="'enable_orders_sync_0" name="enable_orders_sync" value="0" {if empty($enable_orders_sync) || $enable_orders_sync eq 0}checked{/if}>
-                        <label for="'enable_orders_sync_0" class="t">{l s='No' mod='keyinvoiceconnector'}</label>
+                        <div class="col-lg-8">
+                            <label for="">{l s='Enable/disable syncronization' mod='keyinvoiceconnector'}:</label>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_orders_sync_1" name="enable_orders_sync" value="1" type="radio" {if $enable_orders_sync eq 1}checked{/if}>
+                                <label for="'enable_orders_sync_1" class="radioCheck">
+                                    {l s='Yes' mod='keyinvoiceconnector'}
+                                </label>
+                                <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_orders_sync_0" name="enable_orders_sync" value="0" type="radio" {if empty($enable_orders_sync) || $enable_orders_sync eq 0}checked{/if}>
+                                <label for="'enable_orders_sync_0" class="radioCheck">
+                                    {l s='No' mod='keyinvoiceconnector'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
                     </div>
                     <div class="form-group clearfix">
                         <label for="">{l s='Default Document Type' mod='keyinvoiceconnector'}:</label>
@@ -127,17 +215,7 @@
                             <input type="hidden" id="KEYINVOICECONNECTOR_SHIP_DOC_TYPE_hidden" name="KEYINVOICECONNECTOR_SHIP_DOC_TYPE" value="{13|escape:'htmlall':'UTF-8'}" />
                         {/if}
                     </div>
-                    {*
-                    <div class="form-group clearfix">
-                        <label for="">{l s='Default Document Type' mod='keyinvoiceconnector'}:</label>
-                        {if $enable_orders_sync eq 1}
-                            {html_options name=KEYINVOICECONNECTOR_INV_DOC_TYPE options=$InvdocOptions selected=$InvdefaultSelect}
-                         {else}   
-                            {html_options name=KEYINVOICECONNECTOR_INV_DOC_TYPE disabled="disabled" options=$InvdocOptions selected=$InvdefaultSelect}
-                         {/if}
-                    </div>
-                    *}
-                </fielset>
+                </fieldset>
             </div>
             <div class="col-lg-6">
                 <fieldset>
@@ -154,8 +232,8 @@
                         <label>{l s='Shipping Reference' mod='keyinvoiceconnector'}:</label>
                         <input type="text" placeholder="Shipping Cost Mapper" id="KEYINVOICECONNECTOR_SHIPPINGCOST" name="KEYINVOICECONNECTOR_SHIPPINGCOST" value="{$KEYINVOICECONNECTOR_SHIPPINGCOST|escape:'htmlall':'UTF-8'}" />
                     </div>
-                </fielset>
-            </div>        
+                </fieldset>
+            </div>
             <div class="col-lg-6">
                 <fieldset>
                 <legend>&nbsp;</legend>
@@ -164,8 +242,10 @@
             </div>
         </div>
         <div class="form-group clearfix">
-            <div class="submit col-lg-12">
-                <button type="submit" name="ptinvc_save_form" class="button btn btn-default button-medium"><span>{l s='Save' mod='keyinvoiceconnector'} <i class="icon-chevron-right right"></i></span></button>
+            <div class="submit col-lg-offset-10 col-lg-2">
+                <button type="submit" name="ptinvc_save_form" class="button btn btn-default button-medium pull-right">
+                    <i class="process-icon-save"></i> <span>{l s='Save' mod='keyinvoiceconnector'}</span>
+                </button>
             </div>
         </div>
     </form>

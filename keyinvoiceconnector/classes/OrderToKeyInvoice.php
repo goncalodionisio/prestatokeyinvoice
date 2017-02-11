@@ -11,7 +11,7 @@
  *  @author    Majoinfa - Sociedade Unipessoal Lda
  *  @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
  *  @license   LICENSE.txt
-*/
+ */
 
 class OrderToKeyInvoice extends Module
 {
@@ -26,7 +26,7 @@ class OrderToKeyInvoice extends Module
         $opt_deliveryLocation_address    = isset($address_delivery->address1) ? $address_delivery->address1 : 'N/A' ;
         $opt_deliveryLocation_postalCode = isset($address_delivery->postcode) ? $address_delivery->postcode : 'N/A' ;
         $opt_deliveryLocation_city       = isset($address_delivery->city) ? $address_delivery->city : 'N/A' ;
-        
+
         if ($getDocTypeShip == '15') {
 
             $result = $client->insertDocumentHeader_additionalInfo(
@@ -55,9 +55,9 @@ class OrderToKeyInvoice extends Module
     {
 
         $shipping_reference = Configuration::get('KEYINVOICECONNECTOR_SHIPPINGCOST');
-                        
+
         if ($result = $client->getProduct("$session", "$shipping_reference")) {
-            
+
             $Ref       = isset($result->{"DAT"}[0]->Ref) ? $result->{"DAT"}[0]->Ref : 'N/A';
             $Name      = isset($result->{"DAT"}[0]->Name) ? $result->{"DAT"}[0]->Name : 'N/A';
             $ShortName = isset($result->{"DAT"}[0]->ShortName) ? $result->{"DAT"}[0]->ShortName : 'N/A';
@@ -95,8 +95,9 @@ class OrderToKeyInvoice extends Module
         if (isset($result) && $result[0] != '1') {
             return $result;
         }
+
         // custo trasportadoras
-        $result = $client->insertDocumentLine("$session", "$docID", "$getDocTypeShip", "$Ref", "1", "", "", "", "");
+        $result = $client->insertDocumentLine("$session", "$docID", "$getDocTypeShip", "$Ref", "1", "$Price", "$TAX", "$Name", "");
         if (isset($result) && $result[0] != '1') {
             return $result;
         }
@@ -122,9 +123,10 @@ class OrderToKeyInvoice extends Module
                 $getDocTypeShip = Tools::getValue('KEYINVOICECONNECTOR_SHIP_DOC_TYPE');
 
             } else {
-  
+
                 $getDocTypeShip = Configuration::get('KEYINVOICECONNECTOR_SHIP_DOC_TYPE');
             }
+
 
             // se nao estiver configurada transportadora no presta
             $shipping_reference = Configuration::get('KEYINVOICECONNECTOR_SHIPPINGCOST');
@@ -144,6 +146,7 @@ class OrderToKeyInvoice extends Module
                     configurada no KeyInvoice! Encomenda n&atilde;o sincronizada!"
                 );
             }
+
             //$getDocTypeInv  = Tools::getValue('KEYINVOICECONNECTOR_INV_DOC_TYPE');
             $address_invoice = new AddressCore($order->id_address_invoice);
             $address_delivery = new AddressCore($order->id_address_delivery);
@@ -185,9 +188,11 @@ class OrderToKeyInvoice extends Module
                 if (!$cartProducts = $order->getCartProducts()) {
                     return false;
                 }
+
                 foreach ($cartProducts as $cartProduct) {
-                    
+
                     $result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id']);
+
                     if (isset($result) && $result[0] != '1') {
                         return $result;
                     }
@@ -200,7 +205,7 @@ class OrderToKeyInvoice extends Module
                     $product_price = isset($cartProduct['product_price']) ? $cartProduct['product_price'] : '0';
                     $tax = KeyInvoiceConnectorGetValueByID::getTaxByRulesGroup($cartProduct['id_tax_rules_group']);
                     $discount = '0';
-                    
+
                     $result = $client->insertDocumentLine(
                         "$session",
                         "$docID",
@@ -212,6 +217,8 @@ class OrderToKeyInvoice extends Module
                         "$product_name",
                         "$discount"
                     );
+
+
                     if (isset($result) && $result[0] != '1') {
                         return $result;
                     }
@@ -231,12 +238,12 @@ class OrderToKeyInvoice extends Module
                         $docID
                     );
                     if (isset($result) && $result[0] != '1') {
-                         return $result;
+                        return $result;
                     }
                 }
             }
             if ($address_delivery) {
-                
+
                 $result = OrderToKeyInvoice::sendShippingAddr(
                     $session,
                     $client,

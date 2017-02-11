@@ -25,7 +25,9 @@ $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_068f80c7519d0528fb08e82137
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_d227265af2e599f3172d00bb038faa94'] = 'Ativar / Desativar sincronização.';
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_93cba07454f06a4a960172bbd6e2a435'] = 'Sim';
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Não';
-$_MODULE['<{keyinvoiceconnector}prestashop>getcontent_670dc901c0300b41ab20cb169172ab42'] = 'Ativar integração com Keyinvoice e sempre que grava um produto ele é criado no Keyinvoice';
+$_MODULE['<{keyinvoiceconnector}prestashop>getcontent_efd3c4add19a252e830ee839b6a568fe'] = 'Keyinvoice Master Products';
+$_MODULE['<{keyinvoiceconnector}prestashop>getcontent_c5831ed00ce5aae1622975303495bccb'] = 'Criar / Atualizar produto no KeyInvoice';
+$_MODULE['<{keyinvoiceconnector}prestashop>getcontent_ac42ae10dfb1509df64938592162a468'] = 'Se activo apenas cria novos produtos, não actualiza existentes.';
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_e6d0e1c8fc6a4fcf47869df87e04cd88'] = 'Clientes';
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_a748db05999d0061548a3b072a717f29'] = 'Ativar integração com Keyinvoice e sempre que grava informação de um cliente ela é atualizada no Keyinvoice.';
 $_MODULE['<{keyinvoiceconnector}prestashop>getcontent_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Encomendas';

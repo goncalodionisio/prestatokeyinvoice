@@ -25,7 +25,7 @@ class KeyInvoiceConnector extends Module
     {
         $this->name = 'keyinvoiceconnector';
         $this->tab = 'billing_invoicing';
-        $this->version = '1.0.1';
+        $this->version = '1.1.0';
         $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
         parent::__construct();
@@ -48,11 +48,12 @@ class KeyInvoiceConnector extends Module
         }
 
         if (!$this->registerHook('displayAdminOrder') ||
-        !$this->registerHook('actionProductSave') ||
-        !$this->registerHook('orderConfirmation') ||
-        !$this->registerHook('actionObjectAddressUpdateAfter') ||
-        !$this->registerHook('actionObjectAddressAddAfter') ||
-        !$this->registerHook('displayAdminCustomers')) {
+            !$this->registerHook('actionProductSave') ||
+            !$this->registerHook('orderConfirmation') ||
+            !$this->registerHook('actionObjectAddressUpdateAfter') ||
+            !$this->registerHook('actionObjectAddressAddAfter') ||
+            !$this->registerHook('displayAdminCustomers') ||
+            !$this->registerHook('displayBackOfficeFooter')) {
             return false;
         }
         // All went well!
@@ -137,6 +138,8 @@ class KeyInvoiceConnector extends Module
         if (Tools::isSubmit('ptinvc_save_form')) {
             // enable/disable products syncronization with keyinvoice
             ConfigsValidation::setSyncProducts(Tools::getValue('enable_products_sync'));
+            // Keyinvoice Master Produtcts
+            ConfigsValidation::setKeyMasterProducts(Tools::getValue('keyinvoice_master_products'));
             // enable/disable clients syncronization with keyinvoice
             ConfigsValidation::setSyncClients(Tools::getValue('enable_clients_sync'));
             // enable/disable orders syncronization with keyinvoice
@@ -146,6 +149,11 @@ class KeyInvoiceConnector extends Module
             ConfigsValidation::setDocTypeInv(Tools::getValue('KEYINVOICECONNECTOR_INV_DOC_TYPE'));
             // configure doc reference for shipping cost
             ConfigsValidation::setShippingCostProduct(Tools::getValue('KEYINVOICECONNECTOR_SHIPPINGCOST'));
+
+            // enable/disable debug
+            ConfigsValidation::setDebug(Tools::getValue('enable_keyinvoice_debug'));
+            // clean debug
+            ConfigsValidation::setDebugValue('');
             
             // check key
             if (!$kiapi_key = Tools::getValue('KEYINVOICECONNECTOR_KIAPI')) {
@@ -188,6 +196,10 @@ class KeyInvoiceConnector extends Module
         $enable_products_sync = Configuration::get('KEYINVOICECONNECTOR_PRODUCTS_SYNC');
         $this->context->smarty->assign('enable_products_sync', $enable_products_sync);
 
+        // Keyinvoice Master Produtcts
+        $keyinvoice_master_products = Configuration::get('KEYINVOICECONNECTOR_MASTER_PRODUCTS');
+        $this->context->smarty->assign('keyinvoice_master_products', $keyinvoice_master_products);
+
         // enable/disable clients syncronization with keyinvoice
         $enable_clients_sync = Configuration::get('KEYINVOICECONNECTOR_CLIENTS_SYNC');
         $this->context->smarty->assign('enable_clients_sync', $enable_clients_sync);
@@ -198,7 +210,12 @@ class KeyInvoiceConnector extends Module
         
         $KEYINVOICECONNECTOR_SHIPPINGCOST = Configuration::get('KEYINVOICECONNECTOR_SHIPPINGCOST');
         $this->context->smarty->assign('KEYINVOICECONNECTOR_SHIPPINGCOST', $KEYINVOICECONNECTOR_SHIPPINGCOST);
-        
+
+        // enable/disable debug
+        $enable_keyinvoice_debug = Configuration::get('KEYINVOICECONNECTOR_DEBUG');
+        $this->context->smarty->assign('enable_keyinvoice_debug', $enable_keyinvoice_debug);
+
+
         // doctype drop box
         $this->assignDocTypeShip();
         $this->assignDocTypeInv();
@@ -381,6 +398,18 @@ class KeyInvoiceConnector extends Module
         }
 
         return $this->display(__FILE__, 'displayAdminCustomers.tpl');
+    }
+
+    public function hookDisplayBackOfficeFooter()
+    {
+        if (!ConfigsValidation::isInDebug())
+        {
+            return false;
+        }
+
+        $debug = ConfigsValidation::getDebugValue();
+        $this->context->smarty->assign('key_invoice_debug', (isset($debug) ? $debug : ''));
+        return $this->display(__FILE__, 'displayBackOfficeFooter.tpl');
     }
 
     // frontend

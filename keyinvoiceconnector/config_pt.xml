@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>keyinvoiceconnector</name>
+	<displayName><![CDATA[ KeyInvoice Connector]]></displayName>
+	<version><![CDATA[1.1.0]]></version>
+	<description><![CDATA[Integra&ccedil;&atilde;o com o sistema de fatura&ccedil;&atilde;o KeyInvoice]]></description>
+	<author><![CDATA[Majoinfa, Lda]]></author>
+	<tab><![CDATA[billing_invoicing]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>
