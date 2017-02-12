@@ -50,6 +50,14 @@ class ProductToKeyInvoice extends Module
     )
     {
 
+        /************************************************************************
+         * calculate price with tax
+         ************************************************************************/
+        if (ConfigsValidation::isPricePlusTax())
+        {
+            $price = ($tax/100)*$price + $price;
+        }
+        /*************************************************************************/
 
         /************************************************************************
         * set debug
@@ -72,7 +80,6 @@ class ProductToKeyInvoice extends Module
 
         ConfigsValidation::setDebugValue($debug);
         /*************************************************************************/
-
 
         if (!$client = ConfigsValidation::APIWSClient()) {
             return false;
@@ -155,10 +162,8 @@ class ProductToKeyInvoice extends Module
         $isService = isset($product->is_virtual) ? $product->is_virtual : '0';
         $hasStocks = isset($product->is_virtual) ? ((int)$product->getQuantity($product->id) == 0 ? '0' : '1') : '0';
         $active = isset($product->active) ? $product->active : '1';
-        $shortDesc = isset($product->description_short) ?
-            utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description_short))) : 'N/A';
-        $longDesc = isset($product->description) ?
-            utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description))) : 'N/A';
+        $shortDesc = isset($product->description_short) ? utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description_short))) : 'N/A';
+        $longDesc = isset($product->description) ? utf8_encode(strip_tags(ProductToKeyInvoice::stringOrArray($product->description))) : 'N/A';
         $price = isset($product->price) ? $product->price : '';
         $vendorRef = isset($product->supplier_name) ? $product->supplier_name : 'N/A';
         $ean = isset($product->ean13) ? $product->ean13 : '';

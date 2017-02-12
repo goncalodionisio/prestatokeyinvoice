@@ -139,6 +139,14 @@ class ConfigsValidation extends Module
     }
 
     /**
+     * @return bool
+     */
+    public static function isPricePlusTax()
+    {
+        return ((int)ConfigsValidation::getPricePlusTax() == 1);
+    }
+
+    /**
      * Disable Module Configs
      */
     public static function disableSyncronization()
@@ -225,6 +233,14 @@ class ConfigsValidation extends Module
         return Configuration::get('KEYINVOICECONNECTOR_DEBUG_VALUE');
     }
 
+    /**
+     * @return int
+     */
+    public static function getPricePlusTax()
+    {
+        return Configuration::get('KEYINVOICECONNECTOR_PRICE_PLUS_TAX');
+    }
+
     /******************************************************
      * Set Sync Functions
      ******************************************************/
@@ -307,5 +323,13 @@ class ConfigsValidation extends Module
     public static function setDebugValue($value)
     {
         Configuration::updateValue('KEYINVOICECONNECTOR_DEBUG_VALUE', $value);
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setPricePlusTax($value)
+    {
+        Configuration::updateValue('KEYINVOICECONNECTOR_PRICE_PLUS_TAX', $value);
     }
 }

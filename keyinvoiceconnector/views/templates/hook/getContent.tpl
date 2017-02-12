@@ -61,7 +61,38 @@
         <div class="col-lg-12">
             <div class="col-lg-6">
                 <fieldset>
-                <legend>{l s='Debug' mod='keyinvoiceconnector'}:</legend>
+                <legend>{l s='Price+Tax' mod='keyinvoiceconnector'}:</legend>
+                    <div class="form-group clearfix">
+                        <div class="col-lg-8">
+                            <label for="">{l s='Enable/disable price+tax' mod='keyinvoiceconnector'}:</label>
+                        </div>
+                        <div class="col-lg-4">
+                                <span class="switch prestashop-switch fixed-width-lg">
+                                    <input onclick="toggleDraftWarning(false);showOptions(true);showRedirectProductOptions(false);" id="'enable_price_plus_tax_1" name="enable_price_plus_tax" value="1" type="radio" {if $enable_price_plus_tax eq 1}checked{/if}>
+                                    <label for="'enable_price_plus_tax_1" class="radioCheck">
+                                        {l s='Yes' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <input onclick="toggleDraftWarning(true);showOptions(false);showRedirectProductOptions(true);" id="'enable_price_plus_tax_0" name="enable_price_plus_tax" value="0" type="radio" {if empty($enable_price_plus_tax) || $enable_price_plus_tax eq 0}checked{/if}>
+                                    <label for="'enable_price_plus_tax_0" class="radioCheck">
+                                        {l s='No' mod='keyinvoiceconnector'}
+                                    </label>
+                                    <a class="slide-button btn"></a>
+                                </span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-lg-6">
+                <fieldset>
+                <legend>&nbsp;</legend>
+                    <p class="text-justify">- {l s='Enable upload to KeyInvoice Price+Tax for module.' mod='keyinvoiceconnector'}</p>
+                </fieldset>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>{l s='Debug' mod='keyinvoiceconnector'}:</legend>
                     <div class="form-group clearfix">
                         <div class="col-lg-8">
                             <label for="">{l s='Enable/disable debug' mod='keyinvoiceconnector'}:</label>
@@ -84,7 +115,7 @@
             </div>
             <div class="col-lg-6">
                 <fieldset>
-                <legend>&nbsp;</legend>
+                    <legend>&nbsp;</legend>
                     <p class="text-justify">- {l s='Enable debug for module.' mod='keyinvoiceconnector'}</p>
                 </fieldset>
             </div>

@@ -154,6 +154,9 @@ class KeyInvoiceConnector extends Module
             ConfigsValidation::setDebug(Tools::getValue('enable_keyinvoice_debug'));
             // clean debug
             ConfigsValidation::setDebugValue('');
+
+            // enable/disable price+tax
+            ConfigsValidation::setPricePlusTax(Tools::getValue('enable_price_plus_tax'));
             
             // check key
             if (!$kiapi_key = Tools::getValue('KEYINVOICECONNECTOR_KIAPI')) {
@@ -169,7 +172,7 @@ class KeyInvoiceConnector extends Module
                 $this->context->smarty->assign('no_soap', 'nok');
                 ConfigsValidation::deleteByName();
                 return false;
-                
+
             }
             
             // check session
@@ -215,6 +218,9 @@ class KeyInvoiceConnector extends Module
         $enable_keyinvoice_debug = Configuration::get('KEYINVOICECONNECTOR_DEBUG');
         $this->context->smarty->assign('enable_keyinvoice_debug', $enable_keyinvoice_debug);
 
+        // enable/disable price plus tax
+        $enable_price_plus_tax = Configuration::get('KEYINVOICECONNECTOR_PRICE_PLUS_TAX');
+        $this->context->smarty->assign('enable_price_plus_tax', $enable_price_plus_tax);
 
         // doctype drop box
         $this->assignDocTypeShip();
