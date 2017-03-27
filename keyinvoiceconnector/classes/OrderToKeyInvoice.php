@@ -206,6 +206,11 @@ class OrderToKeyInvoice extends Module
                     $tax = KeyInvoiceConnectorGetValueByID::getTaxByRulesGroup($cartProduct['id_tax_rules_group']);
                     $discount = '0';
 
+					if (ConfigsValidation::isPricePlusTax())
+					{
+						$product_price = ($tax/100)*$product_price + $product_price;
+					}
+					
                     $result = $client->insertDocumentLine(
                         "$session",
                         "$docID",
