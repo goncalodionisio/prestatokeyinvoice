@@ -25,7 +25,7 @@ class KeyInvoiceConnector extends Module
     {
         $this->name = 'keyinvoiceconnector';
         $this->tab = 'billing_invoicing';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'Majoinfa, Lda';
         $this->bootstrap = true;
         parent::__construct();
@@ -160,7 +160,6 @@ class KeyInvoiceConnector extends Module
             
             // check key
             if (!$kiapi_key = Tools::getValue('KEYINVOICECONNECTOR_KIAPI')) {
-                
                 $this->context->smarty->assign('no_configuration_key', 'na');
                 ConfigsValidation::deleteByName();
                 return false;
@@ -168,22 +167,17 @@ class KeyInvoiceConnector extends Module
             
             // check soap
             if (!$client = ConfigsValidation::APIWSClient()) {
-                
                 $this->context->smarty->assign('no_soap', 'nok');
                 ConfigsValidation::deleteByName();
                 return false;
-
             }
             
             // check session
             if (!$session = ConfigsValidation::APIWSSession($client, 'getContent')) {
-                
                 $this->context->smarty->assign('no_confirmation_key', 'nok');
                 ConfigsValidation::deleteByName();
                 return false;
-                
             } else {
-                
                 ConfigsValidation::setkiapi(Tools::getValue('KEYINVOICECONNECTOR_KIAPI'));
                 $this->context->smarty->assign('confirmation_key', 'ok');
             }
@@ -338,18 +332,14 @@ class KeyInvoiceConnector extends Module
         $this->assignDocTypeShip();
         //$this->assignDocTypeInv();
         if (Tools::isSubmit('process_sync_order')) {
-
             $result = OrderToKeyInvoice::sendOrderToKeyInvoice($id_order, 'hookDisplayAdminOrder');
             if (isset($result) && $result[0] != '1') {
                 $result[0] = utf8_encode($this->getWSResponse($result[0]));
                 $this->sendWSErrorResponse($result);
-                
             } elseif (isset($result) && $result[0] == '1') {
-                
                 $this->context->smarty->assign('confirmation_ok', $result);
             }
         }
-
          return $this->display(__FILE__, 'displayAdminOrder.tpl');
     }
 
@@ -364,9 +354,7 @@ class KeyInvoiceConnector extends Module
         }
         if (Tools::isSubmit('keyinvoice_save_address')) {
             $result = ClientToKeyInvoice::saveByIdAddress(Tools::getValue('keyinvoice_address_radio'));
-
             if (isset($result)) {
-
                 if ($result[0] != '1') {
                     $result[0] = utf8_encode($this->getWSResponse($result[0]));
                     $this->sendWSErrorResponse($result);
@@ -379,26 +367,20 @@ class KeyInvoiceConnector extends Module
         if (Validate::isLoadedObject($customer = new Customer((int)Tools::getValue('id_customer')))) {
             $address_list = $customer->getAddresses($this->context->language->id);
             $selected_address = "-1";
-
             foreach ($address_list as $addr) {
-
                 try {
                     $vat_number = $addr['vat_number'];
                     $clientAddress = $client->getClient("$session", "$vat_number");
-
                     if (isset($clientAddress) && isset($clientAddress->DAT) && isset($clientAddress->DAT[0]->Address)) {
                         $addr1 = utf8_encode($addr['address1']);
                         $addr2 = utf8_encode($addr['address2']);
-
                         if ($clientAddress->DAT[0]->Address == ($addr1 . ", " . $addr2)) {
                             $selected_address = $addr['id_address'];
                         }
                     }
                 } catch (Exception $e) {
-                    
                 }
             }
-
             $this->context->smarty->assign('selected_address', $selected_address);
             $this->context->smarty->assign('address_list', $address_list);
         }
@@ -408,11 +390,9 @@ class KeyInvoiceConnector extends Module
 
     public function hookDisplayBackOfficeFooter()
     {
-        if (!ConfigsValidation::isInDebug())
-        {
+        if (!ConfigsValidation::isInDebug()) {
             return false;
         }
-
         $debug = ConfigsValidation::getDebugValue();
         $this->context->smarty->assign('key_invoice_debug', (isset($debug) ? $debug : ''));
         return $this->display(__FILE__, 'displayBackOfficeFooter.tpl');
