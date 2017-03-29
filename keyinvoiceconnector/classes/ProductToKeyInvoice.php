@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NOTICE OF LICENSE
  *
@@ -13,6 +12,7 @@
  * @copyright 2016-2021 Majoinfa - Sociedade Unipessoal Lda
  * @license   LICENSE.txt
  */
+ 
 class ProductToKeyInvoice extends Module
 {
 
@@ -47,14 +47,12 @@ class ProductToKeyInvoice extends Module
         $price,
         $vendorRef,
         $ean
-    )
-    {
+    ) {
 
         /************************************************************************
          * calculate price with tax
          ************************************************************************/
-        if (ConfigsValidation::isPricePlusTax())
-        {
+        if (ConfigsValidation::isPricePlusTax()) {
             $price = ($tax/100)*$price + $price;
         }
         /*************************************************************************/
@@ -98,11 +96,8 @@ class ProductToKeyInvoice extends Module
 
 
         if ((int)$result === 1 && (int)$keyinvoice_master === 1) {
-
             $result = array("1");
-
         } elseif ((int)$result === 1 && (int)$keyinvoice_master === 0) {
-
             $result = $client->updateProduct(
                 "$session",
                 "$ref",
@@ -119,9 +114,7 @@ class ProductToKeyInvoice extends Module
                 "$vendorRef",
                 "$ean"
             );
-
         } else {
-
             $result = $client->insertProduct(
                 "$session",
                 "$ref",
@@ -139,7 +132,6 @@ class ProductToKeyInvoice extends Module
                 "$ean"
             );
         }
-
         return $result;
     }
 

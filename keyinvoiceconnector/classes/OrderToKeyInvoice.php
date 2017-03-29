@@ -28,7 +28,6 @@ class OrderToKeyInvoice extends Module
         $opt_deliveryLocation_city       = isset($address_delivery->city) ? $address_delivery->city : 'N/A' ;
 
         if ($getDocTypeShip == '15') {
-
             $result = $client->insertDocumentHeader_additionalInfo(
                 "$session",
                 "$docID",
@@ -48,16 +47,12 @@ class OrderToKeyInvoice extends Module
             return $result;
         }
         return array(1, "Always ok");
-
     }
 
     public static function sendShippingCost($session, $client, $shipping, $getDocTypeShip, $docID)
     {
-
         $shipping_reference = Configuration::get('KEYINVOICECONNECTOR_SHIPPINGCOST');
-
         if ($result = $client->getProduct("$session", "$shipping_reference")) {
-
             $Ref       = isset($result->{"DAT"}[0]->Ref) ? $result->{"DAT"}[0]->Ref : 'N/A';
             $Name      = isset($result->{"DAT"}[0]->Name) ? $result->{"DAT"}[0]->Name : 'N/A';
             $ShortName = isset($result->{"DAT"}[0]->ShortName) ? $result->{"DAT"}[0]->ShortName : 'N/A';
@@ -107,7 +102,6 @@ class OrderToKeyInvoice extends Module
     public static function sendOrderToKeyInvoice($id_order, $from)
     {
         if (Validate::isLoadedObject($order = new Order($id_order))) {
-
             if (!$client = ConfigsValidation::APIWSClient()) {
                 return false;
             }
@@ -119,14 +113,10 @@ class OrderToKeyInvoice extends Module
                 return false;
             }
             if ($from == 'hookDisplayAdminOrder') {
-
                 $getDocTypeShip = Tools::getValue('KEYINVOICECONNECTOR_SHIP_DOC_TYPE');
-
             } else {
-
                 $getDocTypeShip = Configuration::get('KEYINVOICECONNECTOR_SHIP_DOC_TYPE');
             }
-
 
             // se nao estiver configurada transportadora no presta
             $shipping_reference = Configuration::get('KEYINVOICECONNECTOR_SHIPPINGCOST');
@@ -153,7 +143,6 @@ class OrderToKeyInvoice extends Module
             $vat_number = isset($address_invoice->vat_number) ? $address_invoice->vat_number : '' ;
 
             if (!empty($vat_number)) {
-
                 // upsert customer
                 $result = ClientToKeyInvoice::saveByIdAddress($order->id_address_invoice);
                 if (isset($result) && $result[0] != '1') {
@@ -190,13 +179,10 @@ class OrderToKeyInvoice extends Module
                 }
 
                 foreach ($cartProducts as $cartProduct) {
-
                     $result = ProductToKeyInvoice::saveByIdProduct($cartProduct['product_id']);
-
                     if (isset($result) && $result[0] != '1') {
                         return $result;
                     }
-
                     $product_reference = isset($cartProduct['product_reference']) ?
                         $cartProduct['product_reference'] : 'N/A';
                     $product_name = isset($cartProduct['product_name']) ? $cartProduct['product_name'] : 'N/A';
@@ -205,12 +191,9 @@ class OrderToKeyInvoice extends Module
                     $product_price = isset($cartProduct['product_price']) ? $cartProduct['product_price'] : '0';
                     $tax = KeyInvoiceConnectorGetValueByID::getTaxByRulesGroup($cartProduct['id_tax_rules_group']);
                     $discount = '0';
-
-					if (ConfigsValidation::isPricePlusTax())
-					{
-						$product_price = ($tax/100)*$product_price + $product_price;
-					}
-					
+                    if (ConfigsValidation::isPricePlusTax()) {
+                        $product_price = ($tax/100)*$product_price + $product_price;
+                    }
                     $result = $client->insertDocumentLine(
                         "$session",
                         "$docID",
@@ -234,7 +217,6 @@ class OrderToKeyInvoice extends Module
                 $shipping = $order->getShipping();
 
                 if ($shipping[0]['shipping_cost_tax_excl'] != "0.000000") {
-
                     $result = OrderToKeyInvoice::sendShippingCost(
                         $session,
                         $client,
@@ -248,7 +230,6 @@ class OrderToKeyInvoice extends Module
                 }
             }
             if ($address_delivery) {
-
                 $result = OrderToKeyInvoice::sendShippingAddr(
                     $session,
                     $client,
@@ -261,7 +242,6 @@ class OrderToKeyInvoice extends Module
                     return $result;
                 }
             }
-
             $getDiscounts = $order->getDiscounts();
             if ($getDiscounts) {
                 return array(-969,

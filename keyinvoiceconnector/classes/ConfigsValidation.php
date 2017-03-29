@@ -30,19 +30,13 @@ class ConfigsValidation extends Module
      */
     public static function APIWSClient()
     {
-
         try {
-
             $url = "http://login.e-comercial.pt/API3_ws.php?wsdl";
             $client = new SoapClient($url);
-
             return $client;
-
         } catch (Exception $e) {
-
             return false;
         }
-
     }
 
     /**
@@ -54,23 +48,15 @@ class ConfigsValidation extends Module
      */
     public static function APIWSSession($client, $from)
     {
-
         if ($from == 'getContent') {
-
             $kiapi_key = Tools::getValue('KEYINVOICECONNECTOR_KIAPI');
-
         } else {
-
             $kiapi_key = Configuration::get('KEYINVOICECONNECTOR_KIAPI');
-
         }
-
         $kiapi_auth =  $client->authenticate("$kiapi_key");
         if ($kiapi_auth[0] != 1) {
-
             return false;
         }
-
         $session = $kiapi_auth[1];
         return $session;
     }

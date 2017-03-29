@@ -56,7 +56,6 @@ class ClientToKeyInvoice extends Module
                 "$email",
                 "$obs"
             );
-
         } else {
             $result = $client->insertClient(
                 "$session",
@@ -73,7 +72,7 @@ class ClientToKeyInvoice extends Module
 
             /**
              * não faz validação do nif mas não aceita o country por isso merda para isto
-             * $result = $client->insertForeignClient("$session", "$nif", "$country", 
+             * $result = $client->insertForeignClient("$session", "$nif", "$country",
              * "$name", "$address", "$postalCode", "$locality", "$phone", "$fax", "$email", "$obs");
             */
         }
@@ -122,7 +121,7 @@ class ClientToKeyInvoice extends Module
         /**
          * se o vat number não estiver preenchido então enviar erro.
          * $country_code = DB::getInstance()->getValue(
-         * "SELECT iso_code FROM "._DB_PREFIX_."country a, 
+         * "SELECT iso_code FROM "._DB_PREFIX_."country a,
          * "._DB_PREFIX_."country_lang b WHERE a.id_country = b.id_country and b.name = '".$country."'");
          */
         
